@@ -52,7 +52,7 @@ export const HeroSection = () => {
               View My Work
             </a>
             <a
-              href="/src/assets/Sammam%20Mahdi_CV.pdf"
+              href="/sammamcv.pdf"
               download
               className="cosmic-button"
             >
