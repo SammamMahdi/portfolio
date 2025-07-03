@@ -50,7 +50,7 @@ export const PublicationsSection = () => (
               style={{ textDecoration: 'none' }}
             >
               <motion.div
-                className="relative flex items-center bg-card/80 backdrop-blur-md p-8 rounded-2xl shadow-lg overflow-hidden group cursor-pointer"
+                className="relative flex flex-col md:flex-row items-center bg-card/80 backdrop-blur-md p-4 sm:p-8 rounded-2xl shadow-lg overflow-hidden group cursor-pointer"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -68,20 +68,20 @@ export const PublicationsSection = () => (
                     borderLeftColor: 'rgba(220,38,38,0.5)',
                   }}
                 />
-                <span className="absolute left-0 top-6 bottom-6 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
-                <span className="mr-6 z-10 select-none">
+                <span className="absolute left-0 top-4 md:top-6 bottom-4 md:bottom-6 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
+                <span className="mb-4 md:mb-0 md:mr-6 z-10 select-none flex-shrink-0">
                   <span className="transition-all duration-200 group-hover:drop-shadow-[0_0_16px_rgba(220,38,38,0.95)]">
                     {pub.icon}
                   </span>
                 </span>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-2 text-primary">
+                <div className="flex-1 w-full text-center md:text-left overflow-hidden">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-2 text-primary break-words">
                     {pub.title}
                   </h3>
-                  <p className="text-lg text-muted-foreground mb-1">
+                  <p className="text-base sm:text-lg text-muted-foreground mb-1 break-words">
                     <span className="text-primary font-semibold">{pub.type}</span> in <span className="text-primary font-semibold">{pub.venue}</span> ({pub.year}){pub.extra ? `, ${pub.extra}` : ''}
                   </p>
-                  <p className="text-lg text-muted-foreground">
+                  <p className="text-base sm:text-lg text-muted-foreground break-words">
                     DOI: <span className="text-primary underline">{pub.doi}</span>
                   </p>
                 </div>
@@ -90,7 +90,7 @@ export const PublicationsSection = () => (
           ) : (
             <motion.div
               key={idx}
-              className="relative flex items-center bg-card/80 backdrop-blur-md p-8 rounded-2xl shadow-lg overflow-hidden group cursor-pointer"
+              className="relative flex flex-col md:flex-row items-center bg-card/80 backdrop-blur-md p-4 sm:p-8 rounded-2xl shadow-lg overflow-hidden group cursor-pointer"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
@@ -108,20 +108,20 @@ export const PublicationsSection = () => (
                   borderLeftColor: 'rgba(220,38,38,0.5)',
                 }}
               />
-              <span className="absolute left-0 top-6 bottom-6 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
-              <span className="mr-6 z-10 select-none">
+              <span className="absolute left-0 top-4 md:top-6 bottom-4 md:bottom-6 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
+              <span className="mb-4 md:mb-0 md:mr-6 z-10 select-none flex-shrink-0">
                 <span className="transition-all duration-200 group-hover:drop-shadow-[0_0_16px_rgba(220,38,38,0.95)]">
                   {pub.icon}
                 </span>
               </span>
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold mb-2 text-primary">
+              <div className="flex-1 w-full text-center md:text-left overflow-hidden">
+                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-primary break-words">
                   {pub.title}
                 </h3>
-                <p className="text-lg text-muted-foreground mb-1">
+                <p className="text-base sm:text-lg text-muted-foreground mb-1 break-words">
                   <span className="text-primary font-semibold">{pub.type}</span> in <span className="text-primary font-semibold">{pub.venue}</span> ({pub.year}){pub.extra ? `, ${pub.extra}` : ''}
                 </p>
-                <p className="text-lg text-muted-foreground">
+                <p className="text-base sm:text-lg text-muted-foreground break-words">
                   DOI: <span className="text-primary underline">{pub.doi}</span>
                 </p>
               </div>
