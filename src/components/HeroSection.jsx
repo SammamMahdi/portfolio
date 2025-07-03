@@ -47,9 +47,16 @@ export const HeroSection = () => {
             Driven Computer Science student passionate about coding and innovation. Experienced in Machine Learning, Artificial Intelligence, and hands-on research. Always building, always learning, always pushing boundaries.
           </p>
 
-          <div className="pt-4 opacity-0 animate-fade-in-delay-4">
+          <div className="pt-4 opacity-0 animate-fade-in-delay-4 flex flex-col sm:flex-row gap-4 justify-center">
             <a href="#projects" className="cosmic-button">
               View My Work
+            </a>
+            <a
+              href="/src/assets/Sammam%20Mahdi_CV.pdf"
+              download
+              className="cosmic-button"
+            >
+              Download CV
             </a>
           </div>
         </div>

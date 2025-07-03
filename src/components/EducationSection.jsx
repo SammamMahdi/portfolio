@@ -7,21 +7,18 @@ const education = [
     degree: "B.Sc. in Computer Science",
     institution: "BRAC University",
     duration: "2022 onwards",
-    cgpa: "3.90",
   },
   {
     icon: <GraduationCap className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
     degree: "IAL (International A-Level)",
     institution: "Academia (Edexcel)",
     duration: "2019–2021",
-    grade: "A (Equivalent to GPA 5)",
   },
   {
     icon: <GraduationCap className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
     degree: "IGCSE (O-Level)",
     institution: "Academia (Edexcel)",
     duration: "2018–2019",
-    grade: "A (Equivalent to GPA 5)",
   },
 ];
 
