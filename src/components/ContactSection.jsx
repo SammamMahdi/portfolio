@@ -5,7 +5,6 @@ import {
   MapPin,
   Phone,
   Send,
-  Twitch,
   Twitter,
   Github,
   Facebook,
@@ -14,32 +13,16 @@ import {
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 import { motion } from "framer-motion";
 
 export const ContactSection = () => {
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      toast({
-        title: "Message sent!",
-        description: "Thank you for your message. I'll get back to you soon.",
-      });
-      setIsSubmitting(false);
-    }, 1500);
-  };
   return (
     <section id="contact" className="py-24 px-4 relative">
       <div className="container mx-auto max-w-5xl">
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
           Get In <span className="text-primary"> Touch</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
           {/* Contact Info Card */}
           <motion.div
             className="relative group bg-card/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg"
@@ -52,53 +35,53 @@ export const ContactSection = () => {
           >
             {/* Neon accent bar, thicker and glowing */}
             <span className="absolute left-0 top-4 bottom-4 w-1.5 rounded-full bg-primary shadow-[0_0_16px_2px_rgba(220,38,38,0.7)] group-hover:scale-y-110 transition-transform duration-300" />
-            <div className="p-10 md:p-12">
+            <div className="p-5 md:p-10 md:pt-12 md:pb-12">
               <h3 className="text-2xl font-bold mb-8 text-center tracking-wide">Contact Information</h3>
-              <div className="space-y-8">
+              <div className="space-y-6 md:space-y-8">
                 {/* Email */}
-                <div className="flex items-center gap-5">
-                  <div className="p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
+                <div className="flex flex-wrap items-center gap-4 md:gap-5 min-w-0">
+                  <div className="p-3 md:p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
                     <Mail className="h-7 w-7 text-primary transition-all duration-200 group-hover:drop-shadow-[0_0_6px_crimson]" />
                   </div>
-                  <div className="flex flex-col justify-center text-left">
-                    <div className="font-semibold text-base mb-0.5">Email</div>
+                  <div className="flex flex-col justify-center text-left min-w-0">
+                    <div className="font-semibold text-base mb-0.5 break-words">Email</div>
                     <a
                       href="mailto:sammam.mahdi@gmail.com"
-                      className="text-muted-foreground hover:text-primary transition-colors text-sm text-left"
+                      className="text-muted-foreground hover:text-primary transition-colors text-sm text-left break-words"
                     >
                       sammam.mahdi@gmail.com
                     </a>
                   </div>
                 </div>
                 {/* Phone */}
-                <div className="flex items-center gap-5">
-                  <div className="p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
+                <div className="flex flex-wrap items-center gap-4 md:gap-5 min-w-0">
+                  <div className="p-3 md:p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
                     <Phone className="h-7 w-7 text-primary transition-all duration-200 group-hover:drop-shadow-[0_0_6px_crimson]" />
                   </div>
-                  <div className="flex flex-col justify-center text-left">
-                    <div className="font-semibold text-base mb-0.5">Phone</div>
+                  <div className="flex flex-col justify-center text-left min-w-0">
+                    <div className="font-semibold text-base mb-0.5 break-words">Phone</div>
                     <a
                       href="tel:+8801822926571"
-                      className="text-muted-foreground hover:text-primary transition-colors text-sm text-left"
+                      className="text-muted-foreground hover:text-primary transition-colors text-sm text-left break-words"
                     >
                       +880 1822926571
                     </a>
                   </div>
                 </div>
                 {/* Location */}
-                <div className="flex items-center gap-5">
-                  <div className="p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
+                <div className="flex flex-wrap items-center gap-4 md:gap-5 min-w-0">
+                  <div className="p-3 md:p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
                     <MapPin className="h-7 w-7 text-primary transition-all duration-200 group-hover:drop-shadow-[0_0_6px_crimson]" />
                   </div>
-                  <div className="flex flex-col justify-center text-left">
-                    <div className="font-semibold text-base mb-0.5">Location</div>
-                    <span className="text-muted-foreground text-sm text-left">Dhaka, Bangladesh</span>
+                  <div className="flex flex-col justify-center text-left min-w-0">
+                    <div className="font-semibold text-base mb-0.5 break-words">Location</div>
+                    <span className="text-muted-foreground text-sm text-left break-words">Dhaka, Bangladesh</span>
                   </div>
                 </div>
               </div>
-              <div className="pt-10">
+              <div className="pt-8 md:pt-10">
                 <h4 className="font-semibold mb-4 text-center tracking-wide">Connect With Me</h4>
-                <div className="flex flex-wrap gap-4 justify-center">
+                <div className="flex flex-wrap gap-3 md:gap-4 justify-center">
                   {/* LinkedIn */}
                   <a href="https://www.linkedin.com/in/sammam-mahdi-290937170/" target="_blank" rel="noopener noreferrer" className="transition-all duration-200 hover:text-primary hover:scale-110" title="LinkedIn">
                     <Linkedin className="w-6 h-6" />
@@ -145,7 +128,7 @@ export const ContactSection = () => {
           >
             {/* Neon accent bar */}
             <span className="absolute left-0 top-4 bottom-4 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
-            <div className="p-8">
+            <div className="p-5 md:p-8">
               <h3 className="text-2xl font-semibold mb-6">Send a Message</h3>
               <form
                 action="https://formspree.io/f/myzjvlay"
