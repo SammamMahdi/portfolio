@@ -67,7 +67,7 @@ export const ActivitiesSection = () => (
               </span>
             </span>
             <div className="flex-1 w-full text-center md:text-left overflow-hidden">
-              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-primary break-words">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground break-words">
                 {activity.title}
               </h3>
               <p className="text-base sm:text-lg text-muted-foreground break-words">

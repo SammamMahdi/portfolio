@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Menu, X } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { MobileNavbar } from "./MobileNavbar";
 
@@ -17,7 +16,6 @@ const navItems = [
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hideOnScroll, setHideOnScroll] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState("hero");
@@ -74,7 +72,7 @@ export const Navbar = () => {
       >
         <div className="container flex items-center justify-between">
           <a
-            className="text-xl font-bold text-primary flex items-center"
+            className="text-xl font-bold text-foreground flex items-center"
             href="#hero"
           >
             <span className="relative z-10">
@@ -88,11 +86,11 @@ export const Navbar = () => {
                 key={key}
                 href={item.href}
                 className={cn(
-                  "relative px-2 py-1 text-base font-medium transition-colors duration-300",
+                  "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300",
                   "hover:text-primary focus:text-primary outline-none",
                   activeSection === item.id
                     ? "text-primary neon-glow"
-                    : "text-foreground/80"
+                    : "text-foreground/80 hover:text-foreground"
                 )}
                 aria-current={activeSection === item.id ? "page" : undefined}
                 tabIndex={0}

@@ -39,7 +39,7 @@ export const ProjectsSection = () => {
     <section id="projects" className="py-24 px-4 relative">
       <div className="container mx-auto max-w-5xl">
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
-          Featured <span className="text-primary"> Projects </span>
+          Featured <span className="text-foreground"> Projects </span>
         </h2>
         <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
           Here are some of my recent GitHub projects. This list updates live from my public repositories.
@@ -84,7 +84,7 @@ export const ProjectsSection = () => {
                         </span>
                       ))}
                     </div>
-                    <h3 className="text-xl font-semibold mb-1 text-primary">{repo.name}</h3>
+                    <h3 className="text-xl font-semibold mb-1 text-foreground">{repo.name}</h3>
                     <p className="text-muted-foreground text-sm mb-4">
                       {repo.description || "No description provided."}
                     </p>

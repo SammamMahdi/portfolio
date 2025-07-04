@@ -11,12 +11,12 @@ const experiences = [
     icon: <Briefcase className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
     title: "Student Tutor / Teaching Assistant",
     extra: " — from Spring 2025",
-    description: <span>at <span className="text-primary">BRAC University's CSE Department</span></span>
+    description: <span>at <span className="text-primary">BRAC University&apos;s CSE Department</span></span>
   },
   {
     icon: <Book className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
     title: "Teacher",
-    extra: " — 3 years' experience",
+    extra: " — 3 years&apos; experience",
     description: <span>as a teacher for <span className="text-primary">O-Level and A-Level students</span>.</span>
   },
   
@@ -59,7 +59,7 @@ export const WorkExperienceSection = () => (
               </span>
             </span>
             <div className="flex-1 w-full text-center md:text-left overflow-hidden">
-              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-primary break-words">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground break-words">
                 {exp.title}
                 {exp.extra && <span className="text-primary font-bold">{exp.extra}</span>}
               </h3>

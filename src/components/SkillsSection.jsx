@@ -36,8 +36,8 @@ export const SkillsSection = () => {
   return (
     <section id="skills" className="py-24 px-4 relative bg-secondary/30">
       <div className="container mx-auto max-w-5xl">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
-          My <span className="text-primary"> Skills</span>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
+          My <span className="text-foreground"> Skills</span>
         </h2>
 
         <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -74,7 +74,7 @@ export const SkillsSection = () => {
               {/* Red accent bar */}
               <span className="absolute left-0 top-4 bottom-4 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
               <div className="text-left mb-4">
-                <h3 className="font-semibold text-lg text-primary"> {skill.name}</h3>
+                <h3 className="font-semibold text-lg text-foreground"> {skill.name}</h3>
               </div>
               <div className="relative flex items-center w-full h-5 mt-2 mb-2">
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-3 bg-secondary/50 rounded-full" />

@@ -59,8 +59,8 @@ export const EducationSection = () => {
                 </span>
               </span>
               <div className="flex-1 w-full text-center md:text-left overflow-hidden">
-                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-primary break-words">
-                  {edu.degree}, {edu.institution}
+                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground break-words">
+                  {edu.degree}
                 </h3>
                 <p className="text-base sm:text-lg text-muted-foreground mb-1 break-words">
                   Duration: <span className="text-primary font-semibold">{edu.duration}</span>

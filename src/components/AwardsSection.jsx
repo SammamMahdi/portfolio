@@ -44,7 +44,7 @@ export const AwardsSection = () => (
               </span>
             </span>
             <div className="flex-1 w-full text-center md:text-left overflow-hidden">
-              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-primary break-words">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground break-words">
                 {award.title}
                 {award.extra && <span className="text-primary font-bold">{award.extra}</span>}
               </h3>
