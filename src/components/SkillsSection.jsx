@@ -4,28 +4,46 @@ import { motion } from "framer-motion";
 import React from "react";
 
 const skills = [
-  // Machine Learning & AI
-  { name: "Machine Learning", level: 90, category: "ml-ai" },
-  { name: "Artificial Intelligence", level: 85, category: "ml-ai" },
-  { name: "Computer Vision", level: 80, category: "ml-ai" },
-  { name: "LLM-related work", level: 75, category: "ml-ai" },
-
-  // Full Stack Web Development
-  { name: "MERN Stack", level: 80, category: "webdev" },
-  { name: "PHP", level: 70, category: "webdev" },
-  { name: "MySQL", level: 75, category: "webdev" },
-
   // Programming Languages
-  { name: "Python", level: 95, category: "languages" },
-  { name: "Java", level: 85, category: "languages" },
-  { name: "JavaScript", level: 85, category: "languages" },
-  { name: "C++", level: 80, category: "languages" },
+  { name: "Python", level: 95, category: "programming-languages" },
+  { name: "Java", level: 90, category: "programming-languages" },
+  { name: "C++", level: 85, category: "programming-languages" },
+  { name: "JavaScript", level: 85, category: "programming-languages" },
+
+  // Machine Learning & AI
+  { name: "Scikit-Learn", level: 90, category: "ml-ai" },
+  { name: "PyTorch", level: 85, category: "ml-ai" },
+  { name: "TensorFlow", level: 80, category: "ml-ai" },
+  { name: "Keras", level: 80, category: "ml-ai" },
+  { name: "Explainable AI (XAI)", level: 75, category: "ml-ai" },
+  { name: "Large Language Models (LLMs)", level: 75, category: "ml-ai" },
+  { name: "Hyperparameter Tuning", level: 80, category: "ml-ai" },
+  { name: "Model Evaluation", level: 85, category: "ml-ai" },
+
+  // Computer Vision
+  { name: "OpenCV", level: 85, category: "computer-vision" },
+  { name: "MediaPipe", level: 75, category: "computer-vision" },
+  { name: "Image Processing", level: 80, category: "computer-vision" },
+  { name: "Landmark Detection", level: 75, category: "computer-vision" },
+
+  // Robotics
+  { name: "ROS2", level: 70, category: "robotics" },
+  { name: "Gazebo", level: 70, category: "robotics" },
+  { name: "Navigation", level: 75, category: "robotics" },
+
+  // Research
+  { name: "Early Detection", level: 80, category: "research" },
+  { name: "Stroke Diagnosis", level: 80, category: "research" },
+  { name: "Applied AI in Healthcare", level: 85, category: "research" },
+  { name: "Paper Writing in LaTeX", level: 90, category: "research" },
 ];
 
 const categories = [
+  "programming-languages",
   "ml-ai",
-  "webdev",
-  "languages"
+  "computer-vision",
+  "robotics",
+  "research"
 ];
 
 export const SkillsSection = () => {
@@ -60,9 +78,11 @@ export const SkillsSection = () => {
                   : "bg-secondary/70 text-forefround hover:bd-secondary"
               )}
             >
-              {category === "ml-ai" ? "ML & AI" :
-               category === "webdev" ? "Web Dev" :
-               category === "languages" ? "Languages" :
+              {category === "programming-languages" ? "Programming Languages" :
+               category === "ml-ai" ? "Machine Learning & AI" :
+               category === "computer-vision" ? "Computer Vision" :
+               category === "robotics" ? "Robotics" :
+               category === "research" ? "Research" :
                category}
             </button>
           ))}
