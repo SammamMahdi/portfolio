@@ -45,6 +45,14 @@ const skills = [
   { name: "Stroke Diagnosis", level: 80, category: "research" },
   { name: "Applied AI in Healthcare", level: 85, category: "research" },
   { name: "Paper Writing in LaTeX", level: 90, category: "research" },
+
+  // Web Development
+  { name: "MERN Stack", level: 85, category: "webdev" },
+  { name: "Vite", level: 80, category: "webdev" },
+  { name: "Deployment", level: 80, category: "webdev" },
+  { name: "TypeScript", level: 75, category: "webdev" },
+  { name: "PHP", level: 70, category: "webdev" },
+  { name: "MySQL", level: 75, category: "webdev" },
 ];
 
 const categories = [
@@ -52,7 +60,8 @@ const categories = [
   "ml-ai",
   "computer-vision",
   "robotics",
-  "research"
+  "research",
+  "webdev"
 ];
 
 export const SkillsSection = () => {
@@ -92,6 +101,7 @@ export const SkillsSection = () => {
                category === "computer-vision" ? "Computer Vision" :
                category === "robotics" ? "Robotics" :
                category === "research" ? "Research" :
+               category === "webdev" ? "Web Development" :
                category}
             </button>
           ))}

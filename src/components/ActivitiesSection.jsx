@@ -23,12 +23,6 @@ const activities = [
     highlight: 'Speed Cubing',
   },
   {
-    icon: <Puzzle className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
-    title: 'Speed Cubing',
-    description: 'Hobby: ',
-    highlight: 'Speed Cubing',
-  },
-  {
     icon: <Rocket className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
     title: 'Robotics Competitions',
     description: 'Participated in several robotics competitions such as ',
