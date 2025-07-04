@@ -12,7 +12,12 @@ const experiences = [
     icon: <Briefcase className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
     title: "Student Tutor / Teaching Assistant",
     extra: " — from Spring 2025",
-    description: <span>at <span className="text-primary">BRAC University&apos;s CSE Department</span></span>
+    description: (
+      <span>
+        at <span className="text-primary">BRAC University&apos;s CSE Department</span>.<br />
+        Responsibilities include helping students in courses related to <span className="text-primary">Data Structure and Algorithms</span>, assisting them to write correct code, grading quizzes and assignments, providing consultation, and making sure they understand the topics thoroughly.
+      </span>
+    )
   },
   {
     icon: <Book className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,

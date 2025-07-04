@@ -22,6 +22,24 @@ const activities = [
     description: 'Hobby: ',
     highlight: 'Speed Cubing',
   },
+  {
+    icon: <Puzzle className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
+    title: 'Speed Cubing',
+    description: 'Hobby: ',
+    highlight: 'Speed Cubing',
+  },
+  {
+    icon: <Rocket className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
+    title: 'Robotics Competitions',
+    description: 'Participated in several robotics competitions such as ',
+    highlight: 'Soccerbot, Battlebot',
+  },
+  {
+    icon: <Calculator className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
+    title: 'Programming Contests',
+    description: 'Participated in multiple ',
+    highlight: 'programming contests',
+  },
 ];
 
 export const ActivitiesSection = () => {

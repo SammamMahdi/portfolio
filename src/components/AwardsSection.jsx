@@ -2,11 +2,11 @@ import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
 import { useState, useEffect } from "react";
 const awards = [
-  { icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, title: "Daily Star Awards" },
   { icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, title: "Duke of Edinburgh Award", extra: " (Bronze)" },
-  { icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, title: "Academia High Achievers' Award" },
   { icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, title: "HULT Prize Semi-Finalist", extra: " at BRAC University" },
   { icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, title: "Edexcel High Achievers' Awards" },
+  { icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, title: "Daily Star Awards" },
+  { icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, title: "Academia High Achievers' Award" },
 ];
 
 export const AwardsSection = () => {
