@@ -2,14 +2,6 @@ import { ArrowRight, ExternalLink, Github } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-// Utility to detect touch device
-const isTouchDevice = () =>
-  typeof window !== 'undefined' && (
-    'ontouchstart' in window ||
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0
-  );
-
 const pinnedRepos = [
   "Stroke-Detection",
   "WeHeal-final",
@@ -20,10 +12,8 @@ export const ProjectsSection = () => {
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
-    setIsTouch(isTouchDevice());
     fetch("https://corsproxy.io/?https://api.github.com/users/SammamMahdi/repos?sort=updated&per_page=30")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch repos");
@@ -45,9 +35,6 @@ export const ProjectsSection = () => {
       });
   }, []);
 
-  // Animation config
-  const hoverAnim = { scale: 1.04, boxShadow: "0 4px 32px 0 rgba(220, 38, 38, 0.15)", transition: { duration: 0.18 } };
-
   return (
     <section id="projects" className="py-24 px-4 relative">
       <div className="container mx-auto max-w-5xl">
@@ -66,10 +53,10 @@ export const ProjectsSection = () => {
                 key={repo.id}
                 className="relative group bg-card/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg"
                 initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0, ...(isTouch ? hoverAnim : {}) }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, delay: idx * 0.1, ease: 'easeOut' }}
-                {...(!isTouch ? { whileHover: hoverAnim } : {})}
+                whileHover={{ scale: 1.04, boxShadow: "0 4px 32px 0 rgba(220, 38, 38, 0.15)", transition: { duration: 0.18 } }}
               >
                 {/* Red accent bar */}
                 <span className="absolute left-0 top-4 bottom-4 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
