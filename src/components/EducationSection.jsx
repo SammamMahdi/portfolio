@@ -25,11 +25,20 @@ const education = [
 
 export const EducationSection = () => {
   const [tappedIdx, setTappedIdx] = useState(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   useEffect(() => {
+    setIsTouchDevice(
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || window.matchMedia('(pointer: coarse)').matches)
+    );
+    if (!isTouchDevice) setTappedIdx(null);
+  }, [isTouchDevice]);
+  useEffect(() => {
+    if (!isTouchDevice) return;
     const handleTouch = () => setTappedIdx(null);
     window.addEventListener('touchstart', handleTouch);
     return () => window.removeEventListener('touchstart', handleTouch);
-  }, []);
+  }, [isTouchDevice]);
   return (
     <section id="education" className="py-24 px-4 relative bg-secondary/30">
       <div className="container mx-auto max-w-5xl">
@@ -46,12 +55,14 @@ export const EducationSection = () => {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: idx * 0.1, ease: 'easeOut' }}
               whileHover={{ scale: 1.04, boxShadow: '0 4px 32px 0 rgba(220, 38, 38, 0.18)' }}
-              onTouchStart={e => { e.stopPropagation(); setTappedIdx(tappedIdx === idx ? null : idx); }}
-              onClick={e => { if (tappedIdx !== idx) { e.preventDefault(); setTappedIdx(idx); } else { setTappedIdx(null); } }}
+              {...(isTouchDevice ? {
+                onTouchStart: e => { e.stopPropagation(); setTappedIdx(tappedIdx === idx ? null : idx); },
+                onClick: e => { if (tappedIdx !== idx) { e.preventDefault(); setTappedIdx(idx); } else { setTappedIdx(null); } }
+              } : {})}
             >
               {/* Neon circling border on hover, animates once per hover */}
               <span
-                className={`pointer-events-none absolute inset-0 rounded-2xl border-4 border-primary z-20 opacity-0 transition-all duration-300 ${tappedIdx === idx ? 'opacity-100 animate-neon-spin-once' : 'group-hover:opacity-100 group-hover:animate-neon-spin-once'}`}
+                className={`pointer-events-none absolute inset-0 rounded-2xl border-4 border-primary z-20 opacity-0 transition-all duration-300 ${tappedIdx === idx ? 'opacity-100' : 'group-hover:opacity-100'}`}
                 style={{
                   boxShadow: '0 0 24px 6px rgba(220,38,38,0.7), 0 0 60px 10px rgba(220,38,38,0.3)',
                   borderColor: 'rgba(220,38,38,0.85)',
@@ -87,17 +98,6 @@ export const EducationSection = () => {
           ))}
         </div>
       </div>
-      {/* Neon Beam Animation */}
-      <style>{`
-        @keyframes neon-spin-once {
-          0% { transform: rotate(0deg); opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: rotate(360deg); opacity: 0; }
-        }
-        .animate-neon-spin-once {
-          animation: neon-spin-once 1.2s cubic-bezier(0.7,0.2,0.2,1) 1;
-        }
-      `}</style>
     </section>
   );
 }; 
