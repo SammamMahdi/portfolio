@@ -14,7 +14,7 @@ import { Footer } from "../components/Footer";
 
 export const Home = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
       {/* Theme Toggle */}
       {/* <ThemeToggle /> */}
       {/* Background Effects */}
@@ -23,7 +23,7 @@ export const Home = () => {
       {/* Navbar */}
       <Navbar />
       {/* Main Content */}
-      <main>
+      <main className="flex-1">
         <HeroSection />
         <EducationSection />
         <SkillsSection />

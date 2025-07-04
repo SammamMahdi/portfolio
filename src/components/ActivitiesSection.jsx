@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Calculator, Rocket, Bot, Puzzle } from "lucide-react";
+import { Calculator, Rocket, Puzzle, ExternalLink } from "lucide-react";
 
 const activities = [
   {
@@ -13,13 +13,7 @@ const activities = [
     title: 'University Rover Challenge',
     description: 'Participated in the ',
     highlight: 'University Rover Challenge',
-  },
-  {
-    icon: <Bot className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
-    title: 'BRACU Mongol Tori',
-    description: 'Contributor to ',
-    highlight: 'BRACU Mongol Tori',
-    extra: ' (Control and Software Team)',
+    link: 'https://urc.marssociety.org/'
   },
   {
     icon: <Puzzle className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
@@ -60,6 +54,19 @@ export const ActivitiesSection = () => (
             />
             {/* Red accent bar */}
             <span className="absolute left-0 top-4 md:top-6 bottom-4 md:bottom-6 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
+            {/* External link icon for University Rover Challenge */}
+            {activity.title === 'University Rover Challenge' && activity.link && (
+              <a
+                href={activity.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-30 text-primary hover:drop-shadow-[0_0_10px_rgba(220,38,38,0.7)] transition-all duration-200"
+                title="About University Rover Challenge"
+                onClick={e => e.stopPropagation()}
+              >
+                <ExternalLink size={28} />
+              </a>
+            )}
             {/* Monotone Neon Icon */}
             <span className="mb-4 md:mb-0 md:mr-6 z-10 select-none flex-shrink-0">
               <span className="transition-all duration-200 group-hover:drop-shadow-[0_0_16px_rgba(220,38,38,0.95)]">
@@ -73,7 +80,6 @@ export const ActivitiesSection = () => (
               <p className="text-base sm:text-lg text-muted-foreground break-words">
                 {activity.description}
                 <span className="text-primary font-semibold">{activity.highlight}</span>
-                {activity.extra || ''}
               </p>
             </div>
           </motion.div>

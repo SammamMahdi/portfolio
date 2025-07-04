@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Briefcase, Book, Bot } from "lucide-react";
+import { Briefcase, Book, Bot, ExternalLink } from "lucide-react";
 const experiences = [
   {
     icon: <Bot className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
@@ -16,11 +16,20 @@ const experiences = [
   {
     icon: <Book className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
     title: "Teacher",
-    extra: " — 3 years&apos; experience",
+    extra: " — 3 years of experience",
     description: <span>as a teacher for <span className="text-primary">O-Level and A-Level students</span>.</span>
   },
-  
-  
+  // BRACU Mongol Tori merged entry
+  {
+    icon: <Bot className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
+    title: "BRACU Mongol Tori",
+    extra: " — Control, AI & Autonomous Systems",
+    description: <span>
+      Member of the <span className="text-primary">Control, AI, and Autonomous Systems</span> teams for BRACU Mongol Tori.<br />
+      Contributed to the design and implementation of <span className="text-primary">control systems</span>, developed <span className="text-primary">AI and computer vision</span> modules for autonomous navigation and perception, and worked on <span className="text-primary">autonomous systems</span> for the Mars rover project.
+    </span>,
+    link: "https://www.bracu-mongoltori.com/about"
+  },
 ];
 
 export const WorkExperienceSection = () => (
@@ -33,12 +42,16 @@ export const WorkExperienceSection = () => (
         {experiences.map((exp, idx) => (
           <motion.div
             key={idx}
-            className="relative flex flex-col md:flex-row items-center bg-card/80 backdrop-blur-md p-4 sm:p-8 rounded-2xl shadow-lg overflow-hidden group cursor-pointer"
+            className="relative flex flex-col md:flex-row items-center md:items-start bg-card/80 backdrop-blur-md p-4 sm:p-8 rounded-2xl shadow-lg overflow-hidden group cursor-pointer"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: idx * 0.1, ease: 'easeOut' }}
             whileHover={{ scale: 1.04, boxShadow: '0 4px 32px 0 rgba(220, 38, 38, 0.18)' }}
+            onClick={exp.title === 'Research Projects' ? () => {
+              const el = document.getElementById('publications');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            } : undefined}
           >
             {/* Neon circling border on hover, animates once per hover */}
             <span
@@ -53,18 +66,33 @@ export const WorkExperienceSection = () => (
               }}
             />
             <span className="absolute left-0 top-4 md:top-6 bottom-4 md:bottom-6 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
-            <span className="mb-4 md:mb-0 md:ml-4 md:mr-8 z-10 select-none flex-shrink-0">
+            {/* External link icon for BRACU Mongol Tori */}
+            {exp.title === 'BRACU Mongol Tori' && exp.link && (
+              <a
+                href={exp.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="md:absolute md:top-4 md:right-4 md:top-6 md:right-6 z-30 text-primary hover:drop-shadow-[0_0_10px_rgba(220,38,38,0.7)] transition-all duration-200 self-end mb-2 md:mb-0"
+                title="About BRACU Mongol Tori"
+                onClick={e => e.stopPropagation()}
+              >
+                <ExternalLink size={28} />
+              </a>
+            )}
+            <span className="mb-2 md:mb-0 md:ml-4 md:mr-8 z-10 select-none flex-shrink-0 flex justify-center w-full md:w-auto">
               <span className="transition-all duration-200 group-hover:drop-shadow-[0_0_16px_rgba(220,38,38,0.95)]">
                 {exp.icon}
               </span>
             </span>
-            <div className="flex-1 w-full text-center md:text-left overflow-hidden">
-              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground break-words">
-                {exp.title}
+            <div className="flex-1 w-full flex flex-col items-center md:items-start text-center md:text-left overflow-hidden">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground break-words flex flex-col md:flex-row items-center gap-1 md:gap-2 w-full justify-center md:justify-start">
+                <span>{exp.title}</span>
                 {exp.extra && <span className="text-primary font-bold">{exp.extra}</span>}
               </h3>
               {exp.description && (
-                <p className="text-base sm:text-lg text-muted-foreground mt-2 break-words">{exp.description}</p>
+                <p className="text-base sm:text-lg text-muted-foreground mt-2 break-words w-full max-w-2xl">
+                  {exp.description}
+                </p>
               )}
             </div>
           </motion.div>

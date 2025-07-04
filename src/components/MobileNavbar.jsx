@@ -23,10 +23,16 @@ export const MobileNavbar = ({ navItems, activeSection }) => {
       />
       {/* Sidebar menu */}
       <aside
-        className={`fixed top-0 right-0 h-full w-64 bg-[#10111a] z-50 flex flex-col items-center pt-12 shadow-2xl transition-transform duration-500 md:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-0 right-0 h-full w-64 bg-background/80 border-l border-border z-50 flex flex-col items-center pt-0 shadow-2xl transition-transform duration-500 md:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"} overflow-y-auto`}
         style={{ boxShadow: isMenuOpen ? "-4px 0 32px 0 rgba(220,38,38,0.12)" : undefined }}
       >
-        <nav className="flex flex-col space-y-8 w-full px-8">
+        {/* Portfolio Title */}
+        <div className="w-full px-8 pt-8 pb-4 flex flex-col items-center border-b border-border">
+          <span className="text-xl font-bold text-primary neon-glow text-center tracking-wide">
+            Sammam Mahdi <span className="text-glow text-foreground">Portfolio</span>
+          </span>
+        </div>
+        <nav className="flex flex-col space-y-8 w-full px-8 mt-6 mb-8">
           {navItems.map((item, key) => (
             <a
               key={key}
