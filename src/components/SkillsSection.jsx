@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import React from "react";
 
 const skills = [
   // Machine Learning & AI
@@ -29,6 +30,13 @@ const categories = [
 
 export const SkillsSection = () => {
   const [activeCategory, setActiveCategory] = useState("ml-ai");
+  const [tappedIdx, setTappedIdx] = useState(null);
+
+  React.useEffect(() => {
+    const handleTouch = () => setTappedIdx(null);
+    window.addEventListener('touchstart', handleTouch);
+    return () => window.removeEventListener('touchstart', handleTouch);
+  }, []);
 
   const filteredSkills = skills.filter(
     (skill) => skill.category === activeCategory
@@ -64,15 +72,17 @@ export const SkillsSection = () => {
           {filteredSkills.map((skill, key) => (
             <motion.div
               key={key}
-              className="relative bg-card/80 backdrop-blur-md p-6 rounded-2xl shadow-lg overflow-hidden group"
+              className={`relative bg-card/80 backdrop-blur-md p-6 rounded-2xl shadow-lg overflow-hidden group cursor-pointer ${tappedIdx === key ? 'scale-105 shadow-[0_4px_32px_0_rgba(220,38,38,0.15)]' : ''}`}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: key * 0.1, ease: 'easeOut' }}
               whileHover={{ scale: 1.04, boxShadow: "0 4px 32px 0 rgba(220, 38, 38, 0.15)", transition: { duration: 0.18 } }}
+              onTouchStart={e => { e.stopPropagation(); setTappedIdx(tappedIdx === key ? null : key); }}
+              onClick={e => { if (tappedIdx !== key) { e.preventDefault(); setTappedIdx(key); } else { setTappedIdx(null); } }}
             >
               {/* Red accent bar */}
-              <span className="absolute left-0 top-4 bottom-4 w-1 rounded-full bg-primary group-hover:scale-y-110 transition-transform duration-300" />
+              <span className={`absolute left-0 top-4 bottom-4 w-1 rounded-full bg-primary transition-transform duration-300 ${tappedIdx === key ? 'scale-y-110' : 'group-hover:scale-y-110'}`} />
               <div className="text-left mb-4">
                 <h3 className="font-semibold text-lg text-foreground"> {skill.name}</h3>
               </div>

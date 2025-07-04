@@ -8,12 +8,42 @@ import {
   Twitter,
   Github,
   Facebook,
-  Music,
-  Globe,
-  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+
+// SVGs for Spotify, IEEE, ORCID
+const SpotifyIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="12" r="10" fill="none" />
+    <path d="M8 15c2.5-1 5.5-1 8 0" />
+    <path d="M7 12c3-1.5 7-1.5 10 0" />
+    <path d="M6.5 9c3.5-2 8.5-2 12 0" />
+  </svg>
+);
+const IEEEIcon = (props) => (
+  <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect x="6" y="6" width="20" height="20" rx="2" fill="none" />
+    <path d="M16 10v12M10 16h12" />
+    <circle cx="16" cy="16" r="2.5" />
+  </svg>
+);
+const OrcidIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="12" r="10" fill="none" />
+    <circle cx="8.5" cy="12" r="1.5" />
+    <path d="M12 8v8m3.5-4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+  </svg>
+);
+const DiscordIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect x="2" y="2" width="20" height="20" rx="5" fill="none" />
+    <path d="M7.5 16c1.5 1 7.5 1 9 0" />
+    <ellipse cx="9" cy="12" rx="1" ry="1.5" />
+    <ellipse cx="15" cy="12" rx="1" ry="1.5" />
+    <path d="M7 7l2 2m6-2l-2 2" />
+  </svg>
+);
 
 export const ContactSection = () => {
   return (
@@ -96,7 +126,7 @@ export const ContactSection = () => {
                   </a>
                   {/* Spotify */}
                   <a href="https://open.spotify.com/user/31nnfvatqutw3qkxru4ugwmb233m" target="_blank" rel="noopener noreferrer" className="transition-all duration-200 hover:text-primary hover:scale-110" title="Spotify">
-                    <Music className="w-6 h-6" />
+                    <SpotifyIcon className="w-6 h-6" />
                   </a>
                   {/* Twitter/X */}
                   <a href="https://x.com/sammam_mahdi" target="_blank" rel="noopener noreferrer" className="transition-all duration-200 hover:text-primary hover:scale-110" title="X (Twitter)">
@@ -108,11 +138,15 @@ export const ContactSection = () => {
                   </a>
                   {/* IEEE */}
                   <a href="https://authorprofile.ieee.org/author/241810796639769/dashboard" target="_blank" rel="noopener noreferrer" className="transition-all duration-200 hover:text-primary hover:scale-110" title="IEEE">
-                    <Globe className="w-6 h-6" />
+                    <IEEEIcon className="w-6 h-6" />
                   </a>
                   {/* ORCID */}
                   <a href="https://orcid.org/my-orcid?orcid=0009-0005-7202-2692" target="_blank" rel="noopener noreferrer" className="transition-all duration-200 hover:text-primary hover:scale-110" title="ORCID">
-                    <User className="w-6 h-6" />
+                    <OrcidIcon className="w-6 h-6" />
+                  </a>
+                  {/* Discord */}
+                  <a href="https://discord.com/users/sammammahdi" target="_blank" rel="noopener noreferrer" className="transition-all duration-200 hover:text-primary hover:scale-110" title="Discord: sammammahdi">
+                    <DiscordIcon className="w-6 h-6" />
                   </a>
                 </div>
               </div>
