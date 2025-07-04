@@ -19,12 +19,21 @@ const skills = [
   { name: "Large Language Models (LLMs)", level: 75, category: "ml-ai" },
   { name: "Hyperparameter Tuning", level: 80, category: "ml-ai" },
   { name: "Model Evaluation", level: 85, category: "ml-ai" },
+  { name: "Custom Models", level: 80, category: "ml-ai" },
+  { name: "Neural Networks", level: 85, category: "ml-ai" },
+  { name: "VLMS", level: 70, category: "ml-ai" },
+  { name: "CLIP AI", level: 70, category: "ml-ai" },
 
   // Computer Vision
   { name: "OpenCV", level: 85, category: "computer-vision" },
   { name: "MediaPipe", level: 75, category: "computer-vision" },
   { name: "Image Processing", level: 80, category: "computer-vision" },
   { name: "Landmark Detection", level: 75, category: "computer-vision" },
+  { name: "Object Detection", level: 80, category: "computer-vision" },
+  { name: "VSLAM", level: 70, category: "computer-vision" },
+  { name: "Point Cloud Generation", level: 70, category: "computer-vision" },
+  { name: "Semantic Segmentation", level: 75, category: "computer-vision" },
+  { name: "Heat Map Generation", level: 70, category: "computer-vision" },
 
   // Robotics
   { name: "ROS2", level: 70, category: "robotics" },
