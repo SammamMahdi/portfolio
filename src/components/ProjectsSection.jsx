@@ -73,7 +73,7 @@ export const ProjectsSection = () => {
                     {repo.homepage ? (
                       <ExternalLink size={40} className="text-primary" />
                     ) : (
-                      <Github size={40} className="text-muted-foreground" />
+                      <Github size={40} className="text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_12px_rgba(220,38,38,0.8)]" />
                     )}
                   </div>
                   <div className="p-6">
@@ -93,7 +93,7 @@ export const ProjectsSection = () => {
                         {repo.homepage && (
                           <ExternalLink size={20} className="text-foreground/80 hover:text-primary transition-colors duration-300" />
                         )}
-                        <Github size={20} className="text-foreground/80 hover:text-primary transition-colors duration-300" />
+                        <Github size={20} className="text-primary hover:drop-shadow-[0_0_8px_rgba(220,38,38,0.6)] transition-all duration-300" />
                       </div>
                     </div>
                   </div>
