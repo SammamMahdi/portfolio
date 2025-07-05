@@ -22,7 +22,7 @@ const experiences = [
       </span>
     ),
     type: "Teaching",
-    duration: "Spring 2025 - Present"
+    duration: "Ongoing"
   },
   {
     icon: <Book className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
@@ -43,7 +43,7 @@ const experiences = [
     </span>,
     link: "https://www.bracu-mongoltori.com/about",
     type: "Research",
-    duration: "2024"
+    duration: "2024 - 2025"
   },
 ];
 

@@ -115,12 +115,14 @@ export const PublicationsSection = () => {
               </div>
 
               {/* Year badge */}
-              <div className="absolute top-6 left-6 z-30">
-                <div className="inline-flex items-center px-2 py-1 rounded-lg bg-primary/20 text-primary text-xs font-medium border border-primary/30">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  {pub.year}
+              {pub.year && (
+                <div className="absolute top-6 left-6 z-30">
+                  <div className="inline-flex items-center px-2 py-1 rounded-lg bg-primary/20 text-primary text-xs font-medium border border-primary/30">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {pub.year}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* External link icon */}
               {pub.doiUrl && (

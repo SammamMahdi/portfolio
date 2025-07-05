@@ -9,7 +9,7 @@ const activities = [
     description: 'Participant in the ',
     highlight: 'National Mathematical Olympiad',
     type: 'Competition',
-    year: '2023'
+    year: '2016'
   },
   {
     icon: <Rocket className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
@@ -18,7 +18,7 @@ const activities = [
     highlight: 'University Rover Challenge',
     link: 'https://urc.marssociety.org/',
     type: 'Competition',
-    year: '2024'
+    year: '2024 & 2025'
   },
   {
     icon: <Puzzle className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
@@ -26,7 +26,6 @@ const activities = [
     description: 'Hobby: ',
     highlight: 'Speed Cubing',
     type: 'Hobby',
-    year: 'Ongoing'
   },
   {
     icon: <Rocket className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
@@ -34,7 +33,6 @@ const activities = [
     description: 'Participated in several robotics competitions such as ',
     highlight: 'Soccerbot, Battlebot',
     type: 'Competition',
-    year: '2024'
   },
   {
     icon: <Calculator className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />,
@@ -42,7 +40,6 @@ const activities = [
     description: 'Participated in multiple ',
     highlight: 'programming contests',
     type: 'Competition',
-    year: '2024'
   },
 ];
 
@@ -134,12 +131,14 @@ export const ActivitiesSection = () => {
               </div>
 
               {/* Year badge */}
-              <div className="absolute top-6 left-6 z-30">
-                <div className="inline-flex items-center px-2 py-1 rounded-lg bg-primary/20 text-primary text-xs font-medium border border-primary/30">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  {activity.year}
+              {activity.year && (
+                <div className="absolute top-6 left-6 z-30">
+                  <div className="inline-flex items-center px-2 py-1 rounded-lg bg-primary/20 text-primary text-xs font-medium border border-primary/30">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {activity.year}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* External link icon for University Rover Challenge */}
               {activity.title === 'University Rover Challenge' && activity.link && (

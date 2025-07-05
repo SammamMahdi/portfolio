@@ -116,10 +116,12 @@ export const EducationSection = () => {
                     <span className="font-medium">{edu.institution}</span>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="w-4 h-4 text-primary/70" />
-                    <span>{edu.duration}</span>
-                  </div>
+                  {edu.duration && (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="w-4 h-4 text-primary/70" />
+                      <span>{edu.duration}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
