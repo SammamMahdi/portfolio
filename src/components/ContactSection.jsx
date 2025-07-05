@@ -81,41 +81,41 @@ export const ContactSection = () => {
               <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center tracking-wide">Contact Information</h3>
               <div className="space-y-6 md:space-y-8 divide-y divide-white/10">
                 {/* Email */}
-                <div className="flex flex-wrap items-center gap-4 md:gap-5 min-w-0 pb-4">
+                <div className="flex items-start gap-x-3 min-w-0 pb-4">
                   <div className="p-3 md:p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
                     <Mail className="h-7 w-7 text-primary transition-all duration-200 group-hover:drop-shadow-[0_0_6px_crimson]" />
                   </div>
-                  <div className="flex flex-col justify-center text-left min-w-0">
+                  <div className="flex flex-col w-full min-w-0 text-left">
                     <div className="font-semibold text-lg mb-0.5 break-words">Email</div>
                     <a
                       href="mailto:sammam.mahdi@gmail.com"
-                      className="text-primary text-lg underline underline-offset-2 hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary transition-all"
+                      className="text-primary text-lg underline underline-offset-2 hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary transition-all break-all text-left"
                     >
                       sammam.mahdi@gmail.com
                     </a>
                   </div>
                 </div>
                 {/* Phone */}
-                <div className="flex flex-wrap items-center gap-4 md:gap-5 min-w-0 py-4">
+                <div className="flex items-start gap-x-3 min-w-0 py-4">
                   <div className="p-3 md:p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
                     <Phone className="h-7 w-7 text-primary transition-all duration-200 group-hover:drop-shadow-[0_0_6px_crimson]" />
                   </div>
-                  <div className="flex flex-col justify-center text-left min-w-0">
+                  <div className="flex flex-col w-full min-w-0 text-left">
                     <div className="font-semibold text-lg mb-0.5 break-words">Phone</div>
                     <a
                       href="tel:+8801822926571"
-                      className="text-primary text-lg underline underline-offset-2 hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary transition-all"
+                      className="text-primary text-lg hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary transition-all break-all text-left"
                     >
                       +880 1822926571
                     </a>
                   </div>
                 </div>
                 {/* Location */}
-                <div className="flex flex-wrap items-center gap-4 md:gap-5 min-w-0 pt-4">
+                <div className="flex items-start gap-x-3 min-w-0 pt-4">
                   <div className="p-3 md:p-4 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-200 group-hover:bg-primary/20 group-hover:shadow-[0_0_12px_2px_rgba(220,38,38,0.3)]">
                     <MapPin className="h-7 w-7 text-primary transition-all duration-200 group-hover:drop-shadow-[0_0_6px_crimson]" />
                   </div>
-                  <div className="flex flex-col justify-center text-left min-w-0">
+                  <div className="flex flex-col w-full min-w-0 text-left">
                     <div className="font-semibold text-lg mb-0.5 break-words">Location</div>
                     <span className="text-muted-foreground text-lg text-left break-words">Dhaka, Bangladesh</span>
                   </div>
