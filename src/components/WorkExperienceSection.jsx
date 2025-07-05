@@ -43,7 +43,7 @@ const experiences = [
     </span>,
     link: "https://www.bracu-mongoltori.com/about",
     type: "Research",
-    duration: "2024 - 2025"
+    duration: "2023 - 2025"
   },
 ];
 
