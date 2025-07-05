@@ -35,7 +35,7 @@ export const HeroSection = () => {
             />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            <span className="opacity-0 animate-fade-in"> Hi, I'm</span>
+            <span className="opacity-0 animate-fade-in"> Hi, I&apos;m</span>
             <span
               className="text-primary neon-glow"
             >
@@ -48,13 +48,13 @@ export const HeroSection = () => {
           </p>
 
           <div className="pt-4 opacity-0 animate-fade-in-delay-4 flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#projects" className="cosmic-button">
+            <a href="#projects" className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black/60 backdrop-blur text-primary font-bold text-lg shadow-lg border border-white/10 hover:bg-black/80 neon-glow transition-all duration-300 transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary">
               View My Work
             </a>
             <a
               href="/sammamcv.pdf"
               download
-              className="cosmic-button"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black/60 backdrop-blur text-primary font-bold text-lg shadow-lg border border-white/10 hover:bg-black/80 neon-glow transition-all duration-300 transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary"
             >
               Download CV
             </a>
@@ -64,7 +64,10 @@ export const HeroSection = () => {
 
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce">
         <span className="text-sm text-muted-foreground mb-2"> Scroll </span>
-        <ArrowDown className="h-5 w-5 text-primary" />
+        <span className="relative flex items-center justify-center">
+          <span className="absolute w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-lg animate-pulse" />
+          <ArrowDown className="h-5 w-5 text-primary relative z-10" />
+        </span>
       </div>
       {/* Neon Beam Animation */}
       <style>{`

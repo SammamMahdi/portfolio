@@ -99,7 +99,7 @@ export const ProjectsSection = () => {
                 return (
                   <motion.div
                     key={repo.id}
-                    className={`relative group bg-card/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg border border-border/50 transition-all duration-300 flex flex-col ${tappedIdx === idx ? 'scale-105 shadow-[0_8px_40px_0_rgba(220,38,38,0.25)]' : 'hover:shadow-xl'} overflow-hidden`}
+                    className={`relative flex flex-col bg-card/50 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden group border border-primary/10 cursor-pointer transition-all duration-300 ${tappedIdx === idx ? 'scale-105 shadow-[0_8px_40px_0_rgba(220,38,38,0.25)]' : ''}`}
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
@@ -222,7 +222,7 @@ export const ProjectsSection = () => {
             {/* GitHub Link */}
             <div className="text-center">
               <a
-                className="cosmic-button w-fit flex items-center mx-auto gap-2"
+                className="w-fit flex items-center mx-auto gap-2 px-6 py-3 rounded-full bg-black/60 backdrop-blur text-primary font-bold text-lg shadow-lg border border-white/10 hover:bg-black/80 neon-glow transition-all duration-300 transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary"
                 target="_blank"
                 href="https://github.com/SammamMahdi"
                 rel="noopener noreferrer"

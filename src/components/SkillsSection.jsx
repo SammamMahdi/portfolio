@@ -141,7 +141,7 @@ export const SkillsSection = () => {
           {displayedSkills.map((skill, key) => (
             <motion.div
               key={key}
-              className={`relative bg-card/80 backdrop-blur-md p-6 rounded-2xl shadow-lg overflow-hidden group cursor-pointer border border-border/50 ${tappedIdx === key ? 'scale-105 shadow-[0_4px_32px_0_rgba(220,38,38,0.15)]' : ''}`}
+              className={`relative bg-card/50 backdrop-blur-md p-6 rounded-2xl shadow-lg overflow-hidden group cursor-pointer border border-border/50 ${tappedIdx === key ? 'scale-105 shadow-[0_4px_32px_0_rgba(220,38,38,0.15)]' : ''}`}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
