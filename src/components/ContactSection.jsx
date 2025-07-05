@@ -47,11 +47,20 @@ const DiscordIcon = (props) => (
 
 export const ContactSection = () => {
   return (
-    <section id="contact" className="py-24 px-4 relative">
-      <div className="container mx-auto max-w-5xl">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
-          Get In <span className="text-foreground"> Touch</span>
-        </h2>
+    <section id="contact" className="py-24 px-4 relative bg-gradient-to-br from-background/80 via-secondary/10 to-background/80">
+      <div className="container mx-auto max-w-6xl">
+        {/* Section Header */}
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+            Get In Touch
+          </h2>
+        </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
           {/* Contact Info Card */}
           <motion.div

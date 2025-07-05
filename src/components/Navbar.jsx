@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { MobileNavbar } from "./MobileNavbar";
 
 const navItems = [
@@ -19,7 +19,6 @@ export const Navbar = () => {
   const [hideOnScroll, setHideOnScroll] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState("hero");
-  const observerRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,28 +34,32 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // Scrollspy logic
+  // Improved scrollspy logic: uses scroll event and section positions
   useEffect(() => {
-    const sectionIds = navItems.map((item) => item.id);
-    const sections = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter(Boolean);
-    if (observerRef.current) observerRef.current.disconnect();
-    observerRef.current = new window.IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible.length > 0) {
-          setActiveSection(visible[0].target.id);
+    const handleScrollSpy = () => {
+      const sectionIds = navItems.map((item) => item.id);
+      const sections = sectionIds
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
+      const scrollY = window.scrollY;
+      let active = sectionIds[0];
+      for (let i = 0; i < sections.length; i++) {
+        const rect = sections[i].getBoundingClientRect();
+        // If top is above the top of the viewport but not too far above, mark as active
+        if (rect.top <= 80 && rect.bottom > 80) {
+          active = sections[i].id;
+          break;
         }
-      },
-      { threshold: 0.4 }
-    );
-    sections.forEach((section) => {
-      if (section) observerRef.current.observe(section);
-    });
-    return () => observerRef.current && observerRef.current.disconnect();
+        // If at the bottom of the page, set last section as active
+        if (window.innerHeight + scrollY >= document.body.offsetHeight - 2) {
+          active = sectionIds[sectionIds.length - 1];
+        }
+      }
+      setActiveSection(active);
+    };
+    window.addEventListener('scroll', handleScrollSpy, { passive: true });
+    handleScrollSpy(); // Initial call
+    return () => window.removeEventListener('scroll', handleScrollSpy);
   }, []);
 
   return (
@@ -69,25 +72,27 @@ export const Navbar = () => {
           hideOnScroll ? "-translate-y-full" : "translate-y-0"
         )}
         style={{ boxShadow: isScrolled ? "0 2px 24px 0 rgba(220,38,38,0.08)" : undefined }}
+        aria-label="Main navigation"
       >
         <div className="container flex items-center justify-between">
           <a
-            className="text-xl font-bold text-primary flex items-center"
+            className="text-xl font-bold text-primary flex items-center focus-visible:ring-2 focus-visible:ring-primary focus:outline-none rounded-lg px-2 py-1 transition-all duration-200"
             href="#hero"
+            tabIndex={0}
           >
             <span className="relative z-10">
               <span className="text-glow text-foreground"> Sammam Mahdi </span>{" "}
               Portfolio
             </span>
           </a>
-          <div className="flex space-x-4 lg:space-x-8">
+          <div className="flex space-x-2 lg:space-x-6">
             {navItems.map((item, key) => (
               <a
                 key={key}
                 href={item.href}
                 className={cn(
-                  "relative px-2 py-1 text-base font-medium transition-colors duration-300",
-                  "hover:text-primary focus:text-primary outline-none",
+                  "group relative px-3 py-2 pb-1 text-base font-medium rounded-lg transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  "hover:text-primary focus:text-primary",
                   activeSection === item.id
                     ? "text-primary neon-glow"
                     : "text-foreground/80"
@@ -98,8 +103,7 @@ export const Navbar = () => {
                 {item.name}
                 <span
                   className={cn(
-                    "absolute left-0 -bottom-1 w-full h-0.5 rounded-full bg-primary opacity-0 scale-x-0 transition-all duration-300",
-                    "group-hover:opacity-100 group-hover:scale-x-100",
+                    "pointer-events-none absolute inset-x-0 -bottom-0.5 w-full h-0.5 rounded-full bg-primary mx-auto opacity-0 scale-x-0 group-hover:opacity-80 group-hover:scale-x-100 transition-all duration-300",
                     activeSection === item.id && "opacity-100 scale-x-100 neon-glow"
                   )}
                 />
