@@ -15,25 +15,25 @@ const awards = [
     title: "HULT Prize Semi-Finalist", 
     extra: " at BRAC University",
     type: "Competition",
-    year: "2024"
+    year: "2023"
   },
   { 
     icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
     title: "Edexcel High Achievers' Awards",
     type: "Academic",
-    year: "2023"
+    year: "2022"
   },
   { 
     icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
     title: "Daily Star Awards",
     type: "Recognition",
-    year: "2024"
+    year: "2019 & 2022"
   },
   { 
     icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
     title: "Academia High Achievers' Award",
     type: "Academic",
-    year: "2023"
+    year: "2019 & 2022"
   },
 ];
 
