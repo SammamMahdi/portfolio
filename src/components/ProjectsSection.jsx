@@ -49,7 +49,7 @@ export const ProjectsSection = () => {
   };
 
   return (
-    <section id="projects" className="py-24 px-4 relative bg-gradient-to-br from-background/80 via-secondary/10 to-background/80">
+    <section id="projects" className="py-24 px-4 relative">
       <div className="container mx-auto max-w-6xl">
         {/* Section Header */}
         <motion.div
