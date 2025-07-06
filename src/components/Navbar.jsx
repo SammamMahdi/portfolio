@@ -67,7 +67,7 @@ export const Navbar = () => {
       {/* Desktop Navbar */}
       <nav
         className={cn(
-          "fixed w-full z-40 transition-all duration-300 hidden md:block",
+          "fixed w-full z-40 transition-all duration-300 hidden lg:block",
           isScrolled ? "py-2 bg-background/90 backdrop-blur-md shadow-md rounded-b-2xl" : "py-4",
           hideOnScroll ? "-translate-y-full" : "translate-y-0"
         )}

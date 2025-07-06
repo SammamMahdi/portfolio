@@ -99,7 +99,7 @@ export const ProjectsSection = () => {
                 return (
                   <motion.div
                     key={repo.id}
-                    className={`relative flex flex-col bg-card/50 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden group border border-primary/10 cursor-pointer transition-all duration-300 ${tappedIdx === idx ? 'scale-105 shadow-[0_8px_40px_0_rgba(220,38,38,0.25)]' : ''}`}
+                    className={`relative flex flex-col bg-card/40 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden group border border-primary/10 cursor-pointer transition-all duration-300 ${tappedIdx === idx ? 'scale-105 shadow-[0_8px_40px_0_rgba(220,38,38,0.25)]' : ''}`}
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.3 }}

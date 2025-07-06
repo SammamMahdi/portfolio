@@ -8,8 +8,8 @@ export const HeroSection = () => {
       id="hero"
       className="relative min-h-screen flex flex-col items-center justify-center px-4"
     >
-      <div className="container max-w-4xl mx-auto text-center z-10">
-        <div className="space-y-6 flex flex-col items-center">
+      <div className="container max-w-4xl mx-auto flex flex-col items-center justify-center min-h-screen text-center z-10">
+        <div className="space-y-6 flex flex-col items-center flex-1 justify-center">
           {/* Profile Image with Neon Beam */}
           <div className="relative flex items-center justify-center mb-4">
             {/* Neon Beam */}
@@ -60,14 +60,13 @@ export const HeroSection = () => {
             </a>
           </div>
         </div>
-      </div>
-
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce">
-        <span className="text-sm text-muted-foreground mb-2"> Scroll </span>
-        <span className="relative flex items-center justify-center">
-          <span className="absolute w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-lg animate-pulse" />
-          <ArrowDown className="h-5 w-5 text-primary relative z-10" />
-        </span>
+        <div className="mt-10 flex flex-col items-center animate-bounce">
+          <span className="text-sm text-muted-foreground mb-2"> Scroll </span>
+          <span className="relative flex items-center justify-center">
+            <span className="absolute w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-lg animate-pulse" />
+            <ArrowDown className="h-5 w-5 text-primary relative z-10" />
+          </span>
+        </div>
       </div>
       {/* Neon Beam Animation */}
       <style>{`

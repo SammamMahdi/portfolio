@@ -7,7 +7,7 @@ export const MobileNavbar = ({ navItems, activeSection }) => {
       {/* Hamburger button */}
       <button
         onClick={() => setIsMenuOpen((prev) => !prev)}
-        className="fixed top-4 right-4 md:hidden p-2 text-foreground z-50 bg-background/90 rounded-full shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
+        className="fixed top-4 right-4 lg:hidden p-2 text-foreground z-50 bg-background/90 rounded-full shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
         aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
         style={{ boxShadow: "0 2px 12px 0 rgba(220,38,38,0.12)" }}
       >
@@ -17,13 +17,13 @@ export const MobileNavbar = ({ navItems, activeSection }) => {
       </button>
       {/* Sidebar overlay */}
       <div
-        className={`fixed inset-0 z-40 transition-all duration-500 md:hidden ${isMenuOpen ? "bg-black/60 backdrop-blur-sm pointer-events-auto opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-40 transition-all duration-500 lg:hidden ${isMenuOpen ? "bg-black/60 backdrop-blur-sm pointer-events-auto opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={() => setIsMenuOpen(false)}
         aria-hidden="true"
       />
       {/* Sidebar menu */}
       <aside
-        className={`fixed top-0 right-0 h-full w-56 bg-background/90 border-l border-border z-50 flex flex-col items-center pt-0 shadow-2xl transition-all duration-500 md:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"} overflow-y-auto`}
+        className={`fixed top-0 right-0 h-full w-56 bg-background/90 border-l border-border z-50 flex flex-col items-center pt-0 shadow-2xl transition-all duration-500 lg:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"} overflow-y-auto`}
         style={{ boxShadow: isMenuOpen ? "-4px 0 32px 0 rgba(220,38,38,0.12)" : undefined }}
         aria-label="Mobile navigation"
       >
