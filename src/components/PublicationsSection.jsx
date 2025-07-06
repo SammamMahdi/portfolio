@@ -130,7 +130,7 @@ export const PublicationsSection = () => {
                   href={pub.doiUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute bottom-6 right-6 z-30 text-primary hover:text-primary/80 hover:drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] transition-all duration-200"
+                  className="absolute bottom-6 right-6 z-40 text-primary hover:text-primary/80 hover:drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] transition-all duration-200 p-2 -m-2"
                   title="View Publication"
                   onClick={e => e.stopPropagation()}
                 >
