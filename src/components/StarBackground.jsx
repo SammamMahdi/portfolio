@@ -65,7 +65,9 @@ export const StarBackground = () => {
   };
 
   const generateMeteors = () => {
-    const numberOfMeteors = 6;
+    const minMeteors = 3;
+    const maxMeteors = 6;
+    const numberOfMeteors = Math.floor(Math.random() * (maxMeteors - minMeteors + 1)) + minMeteors;
     // Shuffle the METEOR_COLORS array and pick the first 6 for unique colors
     const shuffledColors = METEOR_COLORS
       .map((color) => ({ color, sort: Math.random() }))
