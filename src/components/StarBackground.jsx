@@ -1,7 +1,24 @@
 import { useEffect, useState } from "react";
 
-// id, size, x, y, opacity, animationDuration
-// id, size, x, y, delay, animationDuration
+// Realistic star colors
+const STAR_COLORS = [
+  '#a3c9ff', // blue
+  '#ffffff', // white
+  '#ffe066', // yellow
+  '#ffb347', // orange
+  '#ff7f7f', // red
+];
+
+// Vibrant meteor colors
+const METEOR_COLORS = [
+  '#a3c9ff', // blue
+  '#ffffff', // white
+  '#ffe066', // yellow
+  '#ffb347', // orange
+  '#ff7f7f', // red
+  '#b388ff', // purple
+  '#80ffd3', // teal
+];
 
 export const StarBackground = () => {
   const [stars, setStars] = useState([]);
@@ -35,6 +52,7 @@ export const StarBackground = () => {
         y: Math.random() * 100,
         opacity: Math.random() * 0.5 + 0.5,
         animationDuration: Math.random() * 4 + 2,
+        color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
       });
     }
 
@@ -42,7 +60,7 @@ export const StarBackground = () => {
   };
 
   const generateMeteors = () => {
-    const numberOfMeteors = 4;
+    const numberOfMeteors = 4 + Math.floor(Math.random() * 3); // 4-6 meteors
     const newMeteors = [];
 
     for (let i = 0; i < numberOfMeteors; i++) {
@@ -50,9 +68,11 @@ export const StarBackground = () => {
         id: i,
         size: Math.random() * 2 + 1,
         x: Math.random() * 100,
-        y: Math.random() * 20,
+        y: Math.random() * 40, // more vertical randomness
         delay: Math.random() * 15,
-        animationDuration: Math.random() * 3 + 3,
+        animationDuration: Math.random() * 2 + 2.5, // more speed variety
+        angle: Math.random() * 60 - 30, // -30deg to +30deg
+        color: METEOR_COLORS[Math.floor(Math.random() * METEOR_COLORS.length)],
       });
     }
 
@@ -72,6 +92,7 @@ export const StarBackground = () => {
             top: star.y + "%",
             opacity: star.opacity,
             animationDuration: star.animationDuration + "s",
+            background: star.color,
           }}
         />
       ))}
@@ -87,6 +108,9 @@ export const StarBackground = () => {
             top: meteor.y + "%",
             animationDelay: meteor.delay,
             animationDuration: meteor.animationDuration + "s",
+            background: `linear-gradient(90deg, ${meteor.color} 0%, rgba(0,0,0,0) 100%)`,
+            transform: `rotate(${meteor.angle}deg)`,
+            boxShadow: `0 0 8px 2px ${meteor.color}`,
           }}
         />
       ))}

@@ -49,7 +49,7 @@ export const ProjectsSection = () => {
   };
 
   return (
-    <section id="projects" className="py-24 px-4 relative">
+    <section id="projects" className="py-24 px-4 relative overflow-hidden">
       <div className="container mx-auto max-w-6xl">
         {/* Section Header */}
         <motion.div

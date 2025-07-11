@@ -6,7 +6,7 @@ export const HeroSection = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center px-4"
+      className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden"
     >
       <div className="container max-w-4xl mx-auto flex flex-col items-center justify-center min-h-screen text-center z-10">
         <div className="space-y-6 flex flex-col items-center flex-1 justify-center">
@@ -58,7 +58,6 @@ export const HeroSection = () => {
             >
               Download CV
             </a>
-          </div>
         </div>
         <div className="mt-10 flex flex-col items-center animate-bounce">
           <span className="text-sm text-muted-foreground mb-2"> Scroll </span>
@@ -66,6 +65,7 @@ export const HeroSection = () => {
             <span className="absolute w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-lg animate-pulse" />
             <ArrowDown className="h-5 w-5 text-primary relative z-10" />
           </span>
+          </div>
         </div>
       </div>
       {/* Neon Beam Animation */}
@@ -76,6 +76,15 @@ export const HeroSection = () => {
         }
         .animate-spin-slow {
           animation: spin-slow 3.5s linear infinite;
+        }
+        /* Always keep the black hole left and vertically centered, even on mobile */
+        #hero .absolute.z-0 {
+          left: 0 !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          width: 128px !important;
+          height: 128px !important;
+          opacity: 0.7 !important;
         }
       `}</style>
     </section>
