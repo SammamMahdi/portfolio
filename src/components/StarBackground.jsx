@@ -65,8 +65,8 @@ export const StarBackground = () => {
   };
 
   const generateMeteors = () => {
-    const numberOfMeteors = 5;
-    // Shuffle the METEOR_COLORS array and pick the first 5 for unique colors
+    const numberOfMeteors = 6;
+    // Shuffle the METEOR_COLORS array and pick the first 6 for unique colors
     const shuffledColors = METEOR_COLORS
       .map((color) => ({ color, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
@@ -74,17 +74,31 @@ export const StarBackground = () => {
       .slice(0, numberOfMeteors);
     const newMeteors = [];
 
+    // Use a grid approach for well-spread meteors in the top-left quadrant
+    const cols = 3; // number of columns in the grid
+    const rows = 2; // number of rows in the grid
+    let cell = 0;
     for (let i = 0; i < numberOfMeteors; i++) {
       const color = shuffledColors[i];
+      // Calculate grid position
+      const col = cell % cols;
+      const row = Math.floor(cell / cols);
+      // Each cell covers a portion of the 0-50% width and 0-50% height
+      const cellWidth = 50 / cols;
+      const cellHeight = 50 / rows;
+      // Randomize within the cell for natural spread
+      const x = col * cellWidth + Math.random() * cellWidth;
+      const y = row * cellHeight + Math.random() * cellHeight;
       newMeteors.push({
         id: i,
         size: Math.random() * 2 + 1,
-        x: Math.random() * 100,
-        y: Math.random() * 20,
+        x,
+        y,
         delay: Math.random() * 15,
         animationDuration: Math.random() * 3 + 3,
         color,
       });
+      cell++;
     }
 
     setMeteors(newMeteors);
