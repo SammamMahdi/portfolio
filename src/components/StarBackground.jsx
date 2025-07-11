@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 
-// Realistic star colors
+// Realistic star color palette (hot to cool)
 const STAR_COLORS = [
-  '#a3c9ff', // blue
-  '#ffffff', // white
-  '#ffe066', // yellow
-  '#ffb347', // orange
-  '#ff7f7f', // red
+  { core: "#b9e2ff", edge: "#3a7bd5" }, // blue
+  { core: "#e6f0ff", edge: "#b3cfff" }, // blue-white
+  { core: "#fff", edge: "#e0e0ff" },    // white
+  { core: "#fffbe6", edge: "#ffe680" }, // yellow-white
+  { core: "#fff6cc", edge: "#ffe066" }, // yellow
+  { core: "#ffe0b3", edge: "#ffb347" }, // orange
+  { core: "#ffd6d6", edge: "#ff6666" }, // red
+  { core: "#e0b3ff", edge: "#7d3cff" }, // purple
 ];
 
 // Vibrant meteor colors
@@ -45,14 +48,16 @@ export const StarBackground = () => {
     const newStars = [];
 
     for (let i = 0; i < numberOfStars; i++) {
+      const colorIdx = Math.floor(Math.random() * STAR_COLORS.length);
+      const color = STAR_COLORS[colorIdx];
       newStars.push({
         id: i,
-        size: Math.random() * 3 + 1,
+        size: Math.random() * 4.5 + 2,
         x: Math.random() * 100,
         y: Math.random() * 100,
         opacity: Math.random() * 0.5 + 0.5,
         animationDuration: Math.random() * 4 + 2,
-        color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+        color,
       });
     }
 
@@ -60,19 +65,25 @@ export const StarBackground = () => {
   };
 
   const generateMeteors = () => {
-    const numberOfMeteors = 4 + Math.floor(Math.random() * 3); // 4-6 meteors
+    const numberOfMeteors = 5;
+    // Shuffle the METEOR_COLORS array and pick the first 5 for unique colors
+    const shuffledColors = METEOR_COLORS
+      .map((color) => ({ color, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ color }) => color)
+      .slice(0, numberOfMeteors);
     const newMeteors = [];
 
     for (let i = 0; i < numberOfMeteors; i++) {
+      const color = shuffledColors[i];
       newMeteors.push({
         id: i,
         size: Math.random() * 2 + 1,
         x: Math.random() * 100,
-        y: Math.random() * 40, // more vertical randomness
+        y: Math.random() * 20,
         delay: Math.random() * 15,
-        animationDuration: Math.random() * 2 + 2.5, // more speed variety
-        angle: Math.random() * 60 - 30, // -30deg to +30deg
-        color: METEOR_COLORS[Math.floor(Math.random() * METEOR_COLORS.length)],
+        animationDuration: Math.random() * 3 + 3,
+        color,
       });
     }
 
@@ -82,9 +93,9 @@ export const StarBackground = () => {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       {stars.map((star) => (
-        <div
+        <svg
           key={star.id}
-          className="star animate-pulse-subtle"
+          className="absolute animate-pulse-subtle"
           style={{
             width: star.size + "px",
             height: star.size + "px",
@@ -92,9 +103,17 @@ export const StarBackground = () => {
             top: star.y + "%",
             opacity: star.opacity,
             animationDuration: star.animationDuration + "s",
-            background: star.color,
+            pointerEvents: "none",
           }}
-        />
+        >
+          <defs>
+            <radialGradient id={`star-gradient-${star.id}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor={star.color.core} stopOpacity="1" />
+              <stop offset="100%" stopColor={star.color.edge} stopOpacity="0.2" />
+            </radialGradient>
+          </defs>
+          <circle cx="50%" cy="50%" r="50%" fill={`url(#star-gradient-${star.id})`} />
+        </svg>
       ))}
 
       {meteors.map((meteor) => (
@@ -108,9 +127,12 @@ export const StarBackground = () => {
             top: meteor.y + "%",
             animationDelay: meteor.delay,
             animationDuration: meteor.animationDuration + "s",
-            background: `linear-gradient(90deg, ${meteor.color} 0%, rgba(0,0,0,0) 100%)`,
-            transform: `rotate(${meteor.angle}deg)`,
+            background: `linear-gradient(90deg, ${meteor.color} 0%, #000 100%)`,
+            transform: `rotate(${meteor.angle ?? 0}deg)`,
             boxShadow: `0 0 8px 2px ${meteor.color}`,
+            borderRadius: meteor.size + "px",
+            opacity: 0.92,
+            pointerEvents: "none",
           }}
         />
       ))}
