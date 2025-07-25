@@ -3,12 +3,9 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import { useNavigate } from "react-router-dom";
 
 const chartContainerStyle = {
-  background: "#181a20",
-  borderRadius: "1rem",
-  padding: "2rem",
-  boxShadow: "0 0 24px 2px #111",
-  margin: "2rem auto",
-  maxWidth: 700,
+  maxWidth: 1400,
+  minHeight: 700,
+  margin: "4rem auto 4rem auto",
 };
 
 const neonLineStyle = {
@@ -57,7 +54,6 @@ export default function Analytics() {
   // Group data for chart
   let chartData = [];
   if (view === "Yearly") {
-    // Visits per month in selected year
     const grouped = {};
     for (let m = 1; m <= 12; m++) grouped[m] = 0;
     rawData.filter(v => v.lastVisit.getFullYear() === selectedYear).forEach(v => {
@@ -69,7 +65,6 @@ export default function Analytics() {
       count
     }));
   } else if (view === "Monthly") {
-    // Visits per day in selected month
     const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
     const grouped = {};
     for (let d = 1; d <= daysInMonth; d++) grouped[d] = 0;
@@ -82,7 +77,6 @@ export default function Analytics() {
       count
     }));
   } else if (view === "Weekly") {
-    // Visits per day in selected week
     const grouped = {};
     for (let d = 0; d < 7; d++) grouped[d] = 0;
     rawData.filter(v => v.lastVisit.getFullYear() === selectedYear && getWeekNumber(v.lastVisit) === selectedWeek).forEach(v => {
@@ -94,7 +88,6 @@ export default function Analytics() {
       count
     }));
   } else if (view === "Daily") {
-    // Visits per hour in selected day
     const grouped = {};
     for (let h = 0; h < 24; h++) grouped[h] = 0;
     rawData.filter(v => v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth && v.lastVisit.getDate() === selectedDay).forEach(v => {
@@ -113,7 +106,7 @@ export default function Analytics() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#181a20", color: "#fff" }}>
+    <div className="min-h-screen bg-card text-white flex flex-col items-center justify-center">
       <div className="container mx-auto px-4 py-8">
         <button
           onClick={() => navigate("/")}
@@ -131,15 +124,15 @@ export default function Analytics() {
         >
           ← Back
         </button>
-        <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "0.5rem", textAlign: "center" }}>
+        <h1 style={{ fontSize: "2.5rem", fontWeight: 700, marginBottom: "0.5rem", textAlign: "center" }}>
           Visitor Analytics
         </h1>
         {view === "Daily" && (
-          <div style={{ textAlign: "center", color: "#ff1744", marginBottom: 12, fontWeight: 500 }}>
+          <div style={{ textAlign: "center", color: "#ff1744", marginBottom: 12, fontWeight: 500, fontSize: "1.2rem" }}>
             {`Visits for ${pad(selectedDay)}/${pad(selectedMonth)}/${selectedYear}`}
           </div>
         )}
-        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 24 }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 32 }}>
           {VIEWS.map(v => (
             <button
               key={v}
@@ -149,8 +142,9 @@ export default function Analytics() {
                 color: view === v ? "#fff" : "#ff1744",
                 border: "none",
                 borderRadius: 6,
-                padding: "0.4rem 1.1rem",
+                padding: "0.6rem 1.4rem",
                 fontWeight: 600,
+                fontSize: "1.1rem",
                 boxShadow: view === v ? "0 0 8px #ff1744" : "none",
                 cursor: "pointer"
               }}
@@ -159,38 +153,34 @@ export default function Analytics() {
             </button>
           ))}
         </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 24 }}>
-          {/* Year selector */}
-          <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))} style={{ padding: 6, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 32 }}>
+          <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
             {years.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          {/* Month selector for Monthly, Daily */}
           {(view === "Monthly" || view === "Daily") && (
-            <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))} style={{ padding: 6, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744" }}>
+            <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
               {months.map(m => <option key={m} value={m}>{pad(m)}</option>)}
             </select>
           )}
-          {/* Day selector for Daily */}
           {view === "Daily" && (
-            <select value={selectedDay} onChange={e => setSelectedDay(Number(e.target.value))} style={{ padding: 6, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744" }}>
+            <select value={selectedDay} onChange={e => setSelectedDay(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
               {days.map(d => <option key={d} value={d}>{pad(d)}</option>)}
             </select>
           )}
-          {/* Week selector for Weekly */}
           {view === "Weekly" && (
-            <select value={selectedWeek} onChange={e => setSelectedWeek(Number(e.target.value))} style={{ padding: 6, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744" }}>
+            <select value={selectedWeek} onChange={e => setSelectedWeek(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
               {weeks.map(w => <option key={w} value={w}>Week {w}</option>)}
             </select>
           )}
         </div>
-        <div style={chartContainerStyle}>
+        <div className="bg-card border border-border rounded-xl shadow-lg flex items-center justify-center" style={chartContainerStyle}>
           {loading ? (
             <div style={{ textAlign: "center", color: "#ff1744" }}>Loading chart...</div>
           ) : chartData.every(d => d.count === 0) ? (
             <div style={{ textAlign: "center", color: "#ff1744" }}>No visits for this {view.toLowerCase()}.</div>
           ) : (
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+            <ResponsiveContainer width="100%" height={600}>
+              <LineChart data={chartData} margin={{ top: 60, right: 60, left: 20, bottom: 40 }}>
                 <CartesianGrid stroke="#222" strokeDasharray="3 3" />
                 <XAxis
                   dataKey="label"
@@ -203,7 +193,7 @@ export default function Analytics() {
                   stroke="#fff"
                   tick={{ fill: "#fff" }}
                   allowDecimals={false}
-                  label={{ value: 'Visits', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 14 }}
+                  label={{ value: 'Visits', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 18 }}
                 />
                 <Tooltip
                   contentStyle={{ background: "#222", border: "1px solid #ff1744", color: "#fff" }}
@@ -211,7 +201,7 @@ export default function Analytics() {
                   formatter={(value) => [value, 'Visits']}
                   labelFormatter={(label) => view === "Daily" ? `Hour: ${label}` : label}
                 />
-                <Line type="monotone" dataKey="count" stroke="#ff1744" strokeWidth={3} dot={{ r: 5, fill: "#ff1744", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 7 }} style={neonLineStyle} />
+                <Line type="monotone" dataKey="count" stroke="#ff1744" strokeWidth={3} dot={{ r: 6, fill: "#ff1744", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 9 }} style={neonLineStyle} />
               </LineChart>
             </ResponsiveContainer>
           )}
