@@ -48,24 +48,25 @@ export const Footer = () => {
       >
         <ArrowUp size={22} />
       </a>
-      {/* Visually hidden analytics button */}
+      {/* Small, visible but unobtrusive analytics button in bottom right */}
       <button
         onClick={handleCounterClick}
         style={{
           position: "absolute",
-          top: 0,
-          left: 0,
-          width: 32,
-          height: 32,
-          opacity: 0,
-          pointerEvents: "auto",
-          zIndex: 20,
-          border: "none",
-          background: "none",
+          right: 12,
+          bottom: 12,
+          width: 12,
+          height: 12,
+          borderRadius: "50%",
+          background: "#444",
+          border: "1px solid #888",
           padding: 0,
           margin: 0,
+          zIndex: 30,
+          cursor: "pointer",
         }}
-        aria-label="Show analytics (hidden)"
+        title="Show analytics (hidden)"
+        aria-label="Show analytics"
         tabIndex={0}
       />
       <p className="text-base text-muted-foreground">
