@@ -12,14 +12,16 @@ const chartContainerStyle = {
 };
 
 const glassStyle = {
-  background: "rgba(24, 26, 32, 0.3)", // more transparent
-  borderRadius: "1.25rem",
-  border: "1.5px solid rgba(255,255,255,0.07)", // lighter border
-  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-  backdropFilter: "blur(16px)",
-  WebkitBackdropFilter: "blur(16px)",
+  background: "rgba(24, 26, 32, 0.14)",
+  borderRadius: "2.25rem",
+  border: "2.5px solid transparent",
+  boxShadow: "0 12px 48px 0 rgba(31, 38, 135, 0.22), 0 1.5px 8px 0 rgba(255, 23, 68, 0.08) inset",
+  backdropFilter: "blur(32px)",
+  WebkitBackdropFilter: "blur(32px)",
   padding: "2.5rem 2rem 2.5rem 2rem",
   overflow: "hidden",
+  position: "relative",
+  backgroundClip: "padding-box",
 };
 
 const neonLineStyle = {
@@ -197,9 +199,56 @@ export default function Analytics() {
         </div>
         <div
           className="bg-card border border-border rounded-xl shadow-lg flex items-center justify-center overflow-x-auto"
-          style={{ ...chartContainerStyle, ...glassStyle }}
+          style={{ ...chartContainerStyle, ...glassStyle, boxShadow: '0 12px 48px 0 rgba(31, 38, 135, 0.22), 0 1.5px 8px 0 rgba(255, 23, 68, 0.08) inset' }}
         >
-          <div style={{ minWidth: minChartWidth, width: "100%" }}>
+          {/* Gradient border and shimmer overlay */}
+          <div style={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '2.25rem',
+            zIndex: 2,
+            padding: 2,
+            background: 'linear-gradient(120deg, #ff1744 0%, #3a7bd5 100%)',
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
+            opacity: 0.18,
+          }} />
+          {/* Glass reflection and animated shimmer */}
+          <div style={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            borderRadius: '2.25rem',
+            zIndex: 3,
+            background: 'linear-gradient(120deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 100%)',
+            boxShadow: '0 0 32px 0 rgba(255,255,255,0.08) inset',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute',
+              left: '-40%',
+              top: '10%',
+              width: '80%',
+              height: '18%',
+              background: 'linear-gradient(100deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.01) 100%)',
+              filter: 'blur(6px)',
+              borderRadius: '50%',
+              animation: 'analytics-shimmer 3.5s linear infinite',
+            }} />
+            <style>{`
+              @keyframes analytics-shimmer {
+                0% { left: -40%; opacity: 0.2; }
+                50% { left: 60%; opacity: 0.32; }
+                100% { left: -40%; opacity: 0.2; }
+              }
+            `}</style>
+          </div>
+          <div style={{ minWidth: minChartWidth, width: "100%", position: 'relative', zIndex: 4 }}>
             {loading ? (
               <div style={{ textAlign: "center", color: "#ff1744" }}>Loading chart...</div>
             ) : chartData.every(d => d.count === 0) ? (
