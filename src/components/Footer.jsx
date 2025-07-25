@@ -20,6 +20,26 @@ function setCookie(name, value, days = 365) {
   document.cookie = `${name}=${value}; expires=${expires}; path=/`;
 }
 
+// Style for the visitor count circle (centered)
+const visitorCircleStyle = {
+  width: 48,
+  height: 48,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: "50%",
+  background: "transparent",
+  boxShadow: "none",
+  border: "2px solid #ff1744",
+  color: "#ff1744",
+  fontWeight: 700,
+  fontSize: "1.3rem",
+  textShadow: "0 0 2px #ff1744, 0 0 2px #fff",
+  zIndex: 10,
+  userSelect: "none",
+  margin: "0 auto 12px auto"
+};
+
 export const Footer = () => {
   const [visitorCount, setVisitorCount] = useState(null);
 
@@ -48,36 +68,27 @@ export const Footer = () => {
       >
         <ArrowUp size={22} />
       </a>
-      <p className="text-base text-muted-foreground">
-        &copy; {new Date().getFullYear()} Sammam Mahdi. All rights reserved.
-      </p>
       {visitorCount !== null && (
         <span
-          style={{
-            position: "absolute",
-            left: 24,
-            bottom: 24,
-            width: 48,
-            height: 48,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "50%",
-            background: "transparent",
-            boxShadow: "none",
-            border: "2px solid #ff1744",
-            color: "#ff1744",
-            fontWeight: 700,
-            fontSize: "1.3rem",
-            textShadow: "0 0 2px #ff1744, 0 0 2px #fff",
-            zIndex: 10,
-            userSelect: "none",
-            transition: "box-shadow 0.3s"
-          }}
+          className="visitor-circle"
+          style={visitorCircleStyle}
         >
           {visitorCount}
         </span>
       )}
+      <p className="text-base text-muted-foreground">
+        &copy; {new Date().getFullYear()} Sammam Mahdi. All rights reserved.
+      </p>
+      <style>{`
+        @media (max-width: 600px) {
+          .visitor-circle {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 1rem !important;
+            margin-bottom: 8px !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 };
