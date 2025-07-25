@@ -1,5 +1,5 @@
 import { ArrowUp } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Helper to generate UUID (v4)
@@ -21,29 +21,7 @@ function setCookie(name, value, days = 365) {
   document.cookie = `${name}=${value}; expires=${expires}; path=/`;
 }
 
-// Style for the visitor count circle (centered)
-const visitorCircleStyle = {
-  width: 48,
-  height: 48,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  borderRadius: "50%",
-  background: "transparent",
-  boxShadow: "none",
-  border: "2px solid #ff1744",
-  color: "#ff1744",
-  fontWeight: 700,
-  fontSize: "1.3rem",
-  textShadow: "0 0 2px #ff1744, 0 0 2px #fff",
-  zIndex: 10,
-  userSelect: "none",
-  margin: "0 auto 12px auto",
-  cursor: "pointer"
-};
-
 export const Footer = () => {
-  const [visitorCount, setVisitorCount] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,14 +30,6 @@ export const Footer = () => {
       uuid = generateUUID();
       setCookie('unique_visitor_id', uuid);
     }
-    fetch("/api/visitor", {
-      headers: {
-        'x-visitor-id': uuid
-      }
-    })
-      .then((res) => res.json())
-      .then((data) => setVisitorCount(data.uniqueVisitors))
-      .catch(() => setVisitorCount(null));
   }, []);
 
   const handleCounterClick = () => {
@@ -78,29 +48,29 @@ export const Footer = () => {
       >
         <ArrowUp size={22} />
       </a>
-      {visitorCount !== null && (
-        <span
-          className="visitor-circle"
-          style={visitorCircleStyle}
-          onClick={handleCounterClick}
-          title="Click for analytics (PIN required)"
-        >
-          {visitorCount}
-        </span>
-      )}
+      {/* Visually hidden analytics button */}
+      <button
+        onClick={handleCounterClick}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 32,
+          height: 32,
+          opacity: 0,
+          pointerEvents: "auto",
+          zIndex: 20,
+          border: "none",
+          background: "none",
+          padding: 0,
+          margin: 0,
+        }}
+        aria-label="Show analytics (hidden)"
+        tabIndex={0}
+      />
       <p className="text-base text-muted-foreground">
         &copy; {new Date().getFullYear()} Sammam Mahdi. All rights reserved.
       </p>
-      <style>{`
-        @media (max-width: 600px) {
-          .visitor-circle {
-            width: 32px !important;
-            height: 32px !important;
-            font-size: 1rem !important;
-            margin-bottom: 8px !important;
-          }
-        }
-      `}</style>
     </footer>
   );
 };
