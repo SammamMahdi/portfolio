@@ -15,25 +15,26 @@ async function connectToDatabase() {
 }
 
 export default async function handler(req, res) {
-  // Get the IP address
-  const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
-    req.connection?.remoteAddress ||
-    "unknown";
+  // Get the unique visitor ID from the header
+  const visitorId = req.headers["x-visitor-id"] || "unknown";
+
+  if (visitorId === "unknown") {
+    return res.status(400).json({ error: "Missing visitor ID" });
+  }
 
   try {
     const client = await connectToDatabase();
     const db = client.db(dbName); // Use 'portfolio' database
     const collection = db.collection(collectionName);
 
-    // Upsert the IP (insert if not exists)
+    // Upsert the visitor ID (insert if not exists)
     await collection.updateOne(
-      { ip },
-      { $set: { ip, lastVisit: new Date() } },
+      { visitorId },
+      { $set: { visitorId, lastVisit: new Date() } },
       { upsert: true }
     );
 
-    // Count unique IPs
+    // Count unique visitor IDs
     const uniqueCount = await collection.countDocuments();
 
     res.status(200).json({ uniqueVisitors: uniqueCount });

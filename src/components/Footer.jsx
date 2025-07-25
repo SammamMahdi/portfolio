@@ -1,11 +1,39 @@
 import { ArrowUp } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
+// Helper to generate UUID (v4)
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// Helper to get/set cookie
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+function setCookie(name, value, days = 365) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+}
+
 export const Footer = () => {
   const [visitorCount, setVisitorCount] = useState(null);
 
   useEffect(() => {
-    fetch("/api/visitor")
+    let uuid = getCookie('unique_visitor_id');
+    if (!uuid) {
+      uuid = generateUUID();
+      setCookie('unique_visitor_id', uuid);
+    }
+    fetch("/api/visitor", {
+      headers: {
+        'x-visitor-id': uuid
+      }
+    })
       .then((res) => res.json())
       .then((data) => setVisitorCount(data.uniqueVisitors))
       .catch(() => setVisitorCount(null));
@@ -35,13 +63,13 @@ export const Footer = () => {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: "50%",
-            background: "rgba(30, 0, 0, 0.7)",
-            boxShadow: "0 0 8px 2px #ff1744, 0 0 12px 2px #ff1744 inset",
+            background: "transparent",
+            boxShadow: "none",
             border: "2px solid #ff1744",
             color: "#ff1744",
             fontWeight: 700,
             fontSize: "1.3rem",
-            textShadow: "0 0 4px #ff1744, 0 0 6px #fff, 0 0 1px #ff1744",
+            textShadow: "0 0 2px #ff1744, 0 0 2px #fff",
             zIndex: 10,
             userSelect: "none",
             transition: "box-shadow 0.3s"
