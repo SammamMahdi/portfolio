@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { useNavigate } from "react-router-dom";
+import { StarBackground } from "../components/StarBackground";
 
 const chartContainerStyle = {
   maxWidth: 1400,
   minHeight: 700,
   margin: "4rem auto 4rem auto",
+  position: "relative",
+  zIndex: 1,
+};
+
+const glassStyle = {
+  background: "rgba(24, 26, 32, 0.65)",
+  borderRadius: "1.25rem",
+  border: "1.5px solid rgba(255,255,255,0.12)",
+  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  padding: "2.5rem 2rem 2.5rem 2rem",
+  overflow: "hidden",
 };
 
 const neonLineStyle = {
@@ -105,9 +119,17 @@ export default function Analytics() {
     });
   }
 
+  // Responsive min width for chart area (for horizontal scroll)
+  let minChartWidth = 900;
+  if (view === "Daily") minChartWidth = 1200;
+  if (view === "Monthly") minChartWidth = 1200;
+  if (view === "Weekly") minChartWidth = 900;
+  if (view === "Yearly") minChartWidth = 900;
+
   return (
-    <div className="min-h-screen bg-card text-white flex flex-col items-center justify-center">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen w-full relative flex flex-col items-center justify-center bg-transparent">
+      <StarBackground />
+      <div className="container mx-auto px-2 py-8 relative z-10">
         <button
           onClick={() => navigate("/")}
           style={{
@@ -173,38 +195,46 @@ export default function Analytics() {
             </select>
           )}
         </div>
-        <div className="bg-card border border-border rounded-xl shadow-lg flex items-center justify-center" style={chartContainerStyle}>
-          {loading ? (
-            <div style={{ textAlign: "center", color: "#ff1744" }}>Loading chart...</div>
-          ) : chartData.every(d => d.count === 0) ? (
-            <div style={{ textAlign: "center", color: "#ff1744" }}>No visits for this {view.toLowerCase()}.</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={600}>
-              <LineChart data={chartData} margin={{ top: 60, right: 60, left: 20, bottom: 40 }}>
-                <CartesianGrid stroke="#222" strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="label"
-                  stroke="#fff"
-                  tick={{ fill: "#fff" }}
-                  interval={view === "Daily" ? 1 : 0}
-                  ticks={view === "Daily" ? chartData.filter(d => d.count > 0).map(d => d.label) : undefined}
-                />
-                <YAxis
-                  stroke="#fff"
-                  tick={{ fill: "#fff" }}
-                  allowDecimals={false}
-                  label={{ value: 'Visits', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 18 }}
-                />
-                <Tooltip
-                  contentStyle={{ background: "#222", border: "1px solid #ff1744", color: "#fff" }}
-                  labelStyle={{ color: "#ff1744" }}
-                  formatter={(value) => [value, 'Visits']}
-                  labelFormatter={(label) => view === "Daily" ? `Hour: ${label}` : label}
-                />
-                <Line type="monotone" dataKey="count" stroke="#ff1744" strokeWidth={3} dot={{ r: 6, fill: "#ff1744", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 9 }} style={neonLineStyle} />
-              </LineChart>
-            </ResponsiveContainer>
-          )}
+        <div
+          className="bg-card border border-border rounded-xl shadow-lg flex items-center justify-center overflow-x-auto"
+          style={{ ...chartContainerStyle, ...glassStyle }}
+        >
+          <div style={{ minWidth: minChartWidth, width: "100%" }}>
+            {loading ? (
+              <div style={{ textAlign: "center", color: "#ff1744" }}>Loading chart...</div>
+            ) : chartData.every(d => d.count === 0) ? (
+              <div style={{ textAlign: "center", color: "#ff1744" }}>No visits for this {view.toLowerCase()}.</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={600}>
+                <LineChart data={chartData} margin={{ top: 60, right: 60, left: 20, bottom: 60 }}>
+                  <CartesianGrid stroke="#222" strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="label"
+                    stroke="#fff"
+                    tick={{ fill: "#fff", fontSize: 16 }}
+                    interval={0}
+                    angle={-30}
+                    textAnchor="end"
+                    height={70}
+                    ticks={chartData.map(d => d.label)}
+                  />
+                  <YAxis
+                    stroke="#fff"
+                    tick={{ fill: "#fff", fontSize: 18 }}
+                    allowDecimals={false}
+                    label={{ value: 'Visits', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 20 }}
+                  />
+                  <Tooltip
+                    contentStyle={{ background: "#222", border: "1px solid #ff1744", color: "#fff" }}
+                    labelStyle={{ color: "#ff1744" }}
+                    formatter={(value) => [value, 'Visits']}
+                    labelFormatter={(label) => view === "Daily" ? `Hour: ${label}` : label}
+                  />
+                  <Line type="monotone" dataKey="count" stroke="#ff1744" strokeWidth={3} dot={{ r: 6, fill: "#ff1744", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 9 }} style={neonLineStyle} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
       </div>
     </div>
