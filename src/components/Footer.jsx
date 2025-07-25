@@ -27,12 +27,24 @@ export const Footer = () => {
         <span
           style={{
             position: "absolute",
-            left: 12,
-            bottom: 12,
-            fontSize: "0.9rem",
-            color: "#888",
+            left: 24,
+            bottom: 24,
+            width: 48,
+            height: 48,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "50%",
+            background: "rgba(30, 0, 0, 0.7)",
+            boxShadow: "0 0 16px 4px #ff1744, 0 0 32px 8px #ff1744 inset",
+            border: "2px solid #ff1744",
+            color: "#ff1744",
+            fontWeight: 700,
+            fontSize: "1.3rem",
+            textShadow: "0 0 8px #ff1744, 0 0 16px #fff, 0 0 2px #ff1744",
             zIndex: 10,
-            userSelect: "none"
+            userSelect: "none",
+            transition: "box-shadow 0.3s"
           }}
         >
           {visitorCount}
