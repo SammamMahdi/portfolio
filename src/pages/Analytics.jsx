@@ -13,14 +13,13 @@ const chartContainerStyle = {
 
 const glassStyle = {
   background: "rgba(24, 26, 32, 0.18)", // even more transparent
-  borderRadius: "1.75rem",
+  borderRadius: "1.25rem",
   border: "1.5px solid rgba(255,255,255,0.04)", // even lighter border
-  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.18)",
-  backdropFilter: "blur(24px)",
-  WebkitBackdropFilter: "blur(24px)",
+  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
   padding: "2.5rem 2rem 2.5rem 2rem",
   overflow: "hidden",
-  position: "relative",
 };
 
 const neonLineStyle = {
@@ -200,16 +199,7 @@ export default function Analytics() {
           className="bg-card border border-border rounded-xl shadow-lg flex items-center justify-center overflow-x-auto"
           style={{ ...chartContainerStyle, ...glassStyle }}
         >
-          {/* Glass gradient overlay */}
-          <div style={{
-            pointerEvents: 'none',
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '1.75rem',
-            background: 'linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%)',
-            zIndex: 2,
-          }} />
-          <div style={{ minWidth: minChartWidth, width: "100%", position: 'relative', zIndex: 3 }}>
+          <div style={{ minWidth: minChartWidth, width: "100%" }}>
             {loading ? (
               <div style={{ textAlign: "center", color: "#ff1744" }}>Loading chart...</div>
             ) : chartData.every(d => d.count === 0) ? (
