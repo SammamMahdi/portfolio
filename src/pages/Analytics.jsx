@@ -130,22 +130,47 @@ export default function Analytics() {
     <div className="min-h-screen w-full relative flex flex-col items-center justify-center bg-transparent">
       <StarBackground />
       <div className="container mx-auto px-2 py-8 relative z-10">
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            background: "#ff1744",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            padding: "0.5rem 1.2rem",
-            fontWeight: 600,
-            marginBottom: "2rem",
-            boxShadow: "0 0 8px #ff1744",
-            cursor: "pointer"
-          }}
-        >
-          ← Back
-        </button>
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 32, alignItems: 'center' }}>
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              background: "#ff1744",
+              color: "#fff",
+              border: "none",
+              borderRadius: 6,
+              padding: "0.6rem 1.4rem",
+              fontWeight: 600,
+              fontSize: "1.1rem",
+              boxShadow: "0 0 8px #ff1744",
+              cursor: "pointer",
+              marginRight: 16,
+              transition: 'background 0.2s, color 0.2s',
+            }}
+          >
+            ← Back
+          </button>
+          {VIEWS.map(v => (
+            <button
+              key={v}
+              onClick={() => setView(v)}
+              style={{
+                background: view === v ? "#ff1744" : "#222",
+                color: view === v ? "#fff" : "#ff1744",
+                border: view === v ? "2px solid #ff1744" : "2px solid #222",
+                borderRadius: 6,
+                padding: "0.6rem 1.4rem",
+                fontWeight: 600,
+                fontSize: "1.1rem",
+                boxShadow: view === v ? "0 0 8px #ff1744" : "none",
+                cursor: "pointer",
+                marginRight: 0,
+                transition: 'background 0.2s, color 0.2s',
+              }}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
         <h1 style={{ fontSize: "2.5rem", fontWeight: 700, marginBottom: "0.5rem", textAlign: "center" }}>
           Visitor Analytics
         </h1>
@@ -154,27 +179,6 @@ export default function Analytics() {
             {`Visits for ${pad(selectedDay)}/${pad(selectedMonth)}/${selectedYear}`}
           </div>
         )}
-        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 32 }}>
-          {VIEWS.map(v => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              style={{
-                background: view === v ? "#ff1744" : "#222",
-                color: view === v ? "#fff" : "#ff1744",
-                border: "none",
-                borderRadius: 6,
-                padding: "0.6rem 1.4rem",
-                fontWeight: 600,
-                fontSize: "1.1rem",
-                boxShadow: view === v ? "0 0 8px #ff1744" : "none",
-                cursor: "pointer"
-              }}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 32 }}>
           <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
             {years.map(y => <option key={y} value={y}>{y}</option>)}
@@ -207,7 +211,7 @@ export default function Analytics() {
             ) : (
               <ResponsiveContainer width="100%" height={600}>
                 <LineChart data={chartData} margin={{ top: 60, right: 60, left: 20, bottom: 60 }}>
-                  <CartesianGrid stroke="#222" strokeDasharray="3 3" />
+                  <CartesianGrid stroke="#ff1744" strokeOpacity={0.25} strokeDasharray="3 3" />
                   <XAxis
                     dataKey="label"
                     stroke="#fff"
