@@ -12,9 +12,9 @@ const chartContainerStyle = {
 };
 
 const glassStyle = {
-  background: "rgba(24, 26, 32, 0.65)",
+  background: "rgba(24, 26, 32, 0.3)", // more transparent
   borderRadius: "1.25rem",
-  border: "1.5px solid rgba(255,255,255,0.12)",
+  border: "1.5px solid rgba(255,255,255,0.07)", // lighter border
   boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
   backdropFilter: "blur(16px)",
   WebkitBackdropFilter: "blur(16px)",
