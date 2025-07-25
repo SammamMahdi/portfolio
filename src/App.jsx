@@ -3,7 +3,6 @@ import { Home } from "./pages/Home";
 import { NotFound } from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 import { AnimatedRobot } from "./components/AnimatedRobot";
-import { Analytics } from "@vercel/analytics/next"
 function App() {
   return (
     <>
@@ -15,7 +14,6 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-      <Analytics />
     </>
   );
 }
