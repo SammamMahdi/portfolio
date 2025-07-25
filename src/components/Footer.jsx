@@ -1,5 +1,6 @@
 import { ArrowUp } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Helper to generate UUID (v4)
 function generateUUID() {
@@ -37,11 +38,13 @@ const visitorCircleStyle = {
   textShadow: "0 0 2px #ff1744, 0 0 2px #fff",
   zIndex: 10,
   userSelect: "none",
-  margin: "0 auto 12px auto"
+  margin: "0 auto 12px auto",
+  cursor: "pointer"
 };
 
 export const Footer = () => {
   const [visitorCount, setVisitorCount] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let uuid = getCookie('unique_visitor_id');
@@ -59,6 +62,13 @@ export const Footer = () => {
       .catch(() => setVisitorCount(null));
   }, []);
 
+  const handleCounterClick = () => {
+    const pin = window.prompt("Enter PIN to view analytics:");
+    if (pin === "621311518") {
+      navigate("/analytics");
+    }
+  };
+
   return (
     <footer className="py-8 px-4 bg-card border-t border-border mt-12 flex flex-col items-center justify-center text-center relative">
       <a
@@ -72,6 +82,8 @@ export const Footer = () => {
         <span
           className="visitor-circle"
           style={visitorCircleStyle}
+          onClick={handleCounterClick}
+          title="Click for analytics (PIN required)"
         >
           {visitorCount}
         </span>

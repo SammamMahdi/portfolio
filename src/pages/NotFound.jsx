@@ -60,15 +60,6 @@ const NeutronStarAnimation = () => {
   );
 };
 
-export const NotFound = () => {
-  return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center px-4">
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-3xl font-bold text-primary">NotFound</div>
-      </div>
-      <div className="flex justify-center items-center md:ml-12 mt-8 md:mt-0">
-        <NeutronStarAnimation />
-      </div>
-    </div>
-  );
-};
+export default function NotFound() {
+  return <div style={{ color: '#fff', textAlign: 'center', marginTop: '4rem' }}>Page Not Found</div>;
+}
