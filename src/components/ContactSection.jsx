@@ -73,7 +73,7 @@ export const ContactSection = () => {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
             whileHover={{ scale: 1.04, boxShadow: '0 4px 32px 0 rgba(220, 38, 38, 0.18)', transition: { duration: 0.18 } }}
-            style={{ background: 'linear-gradient(135deg, rgba(30,30,40,0.95) 60%, rgba(60,0,20,0.7) 100%)' }}
+            style={{ background: 'linear-gradient(135deg, rgba(30,30,40,0.4) 60%, rgba(60,0,20,0.4) 100%)' }}
           >
             {/* Neon accent bar, thicker and glowing */}
             <span className="absolute left-0 top-4 bottom-4 w-1.5 rounded-full bg-primary shadow-[0_0_16px_2px_rgba(220,38,38,0.7)] group-hover:scale-y-110 transition-transform duration-300" />
