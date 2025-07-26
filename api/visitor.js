@@ -22,20 +22,25 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  console.log("Visitor API called");
+
   try {
     const client = await connectToDatabase();
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
     // Add a new view entry with timestamp
-    await collection.insertOne({
+    const result = await collection.insertOne({
       timestamp: new Date(),
       date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
     });
 
+    console.log("Inserted view:", result);
+
     // Get total view count
     const totalViews = await collection.countDocuments();
 
+    console.log("Total views:", totalViews);
     res.status(200).json({ totalViews });
   } catch (error) {
     console.error("Database error:", error);

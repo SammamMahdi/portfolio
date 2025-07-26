@@ -11,8 +11,15 @@ import { SkillsSection } from "../components/SkillsSection";
 import { ProjectsSection } from "../components/ProjectsSection";
 import { ContactSection } from "../components/ContactSection";
 import { Footer } from "../components/Footer";
+import { useEffect } from "react";
 
 export const Home = () => {
+  useEffect(() => {
+    // Record a visit when the home page loads
+    fetch("/api/visitor", {
+      method: "POST",
+    }).catch(console.error);
+  }, []);
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
       {/* Theme Toggle */}

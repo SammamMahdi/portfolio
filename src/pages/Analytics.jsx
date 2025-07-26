@@ -53,10 +53,14 @@ export default function Analytics() {
     fetch("/api/visitor-analytics")
       .then((res) => res.json())
       .then((res) => {
+        console.log("Analytics response:", res);
         setRawData(res.visits.map(v => ({ ...v, lastVisit: new Date(v.timestamp) })));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((error) => {
+        console.error("Analytics error:", error);
+        setLoading(false);
+      });
   }, []);
 
   // Get available years, months, weeks, days from data
