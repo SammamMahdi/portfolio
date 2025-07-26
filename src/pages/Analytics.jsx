@@ -49,9 +49,26 @@ export default function Analytics() {
   const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
   const [filterStartDate, setFilterStartDate] = useState("");
   const [filterEndDate, setFilterEndDate] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if user is authenticated (has entered correct PIN)
+    const authStatus = sessionStorage.getItem('analytics_authenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    } else {
+      // Prompt for PIN
+      const pin = window.prompt("Enter PIN to view analytics:");
+      if (pin === "621311518") {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('analytics_authenticated', 'true');
+      } else {
+        navigate("/");
+        return;
+      }
+    }
+
     fetch("/api/visitor-analytics")
       .then((res) => res.json())
       .then((res) => {
@@ -63,7 +80,7 @@ export default function Analytics() {
         console.error("Analytics error:", error);
         setLoading(false);
       });
-  }, []);
+  }, [navigate]);
 
   // Get available years, months, weeks, days from data
   const years = Array.from(new Set(rawData.map(v => v.lastVisit.getFullYear()))).sort((a, b) => b - a);
@@ -164,6 +181,47 @@ export default function Analytics() {
     }).sort((a, b) => b.lastVisit - a.lastVisit); // newest first
   }, [rawData, filterStartDate, filterEndDate]);
 
+  const handleDeleteRecords = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete ALL visitor records? This action cannot be undone.");
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch("/api/delete-visitors", {
+        method: "DELETE",
+      });
+      
+      if (response.ok) {
+        alert("All visitor records have been deleted successfully.");
+        // Refresh the data
+        window.location.reload();
+      } else {
+        alert("Failed to delete records. Please try again.");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Error deleting records. Please try again.");
+    }
+  };
+
+  const handleDeleteRecord = async (visitorId, lastVisit) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+    if (!confirmDelete) return;
+    try {
+      const response = await fetch("/api/delete-visitor", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visitorId, lastVisit })
+      });
+      if (response.ok) {
+        setRawData(prev => prev.filter(v => !(v.visitorId === visitorId && v.lastVisit.toISOString() === lastVisit)));
+      } else {
+        alert("Failed to delete record.");
+      }
+    } catch (error) {
+      alert("Error deleting record.");
+    }
+  };
+
   return (
     <div className="min-h-screen w-full relative flex flex-col items-center justify-center bg-transparent">
       <StarBackground />
@@ -174,6 +232,18 @@ export default function Analytics() {
             Visitor Analytics
           </h1>
         </div>
+
+        {/* Delete Records Button */}
+        {isAuthenticated && (
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={handleDeleteRecords}
+              className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-md font-semibold transition-colors cursor-pointer border-2 border-red-600"
+            >
+              🗑️ Delete All Records
+            </button>
+          </div>
+        )}
 
         {/* View Buttons + Back Button */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
@@ -336,12 +406,13 @@ export default function Analytics() {
                 <th className="px-3 py-2 font-semibold text-white">Date</th>
                 <th className="px-3 py-2 font-semibold text-white">Time</th>
                 <th className="px-3 py-2 font-semibold text-white">Visitor ID</th>
+                {isAuthenticated && <th className="px-3 py-2 font-semibold text-white text-center">Delete</th>}
               </tr>
             </thead>
             <tbody>
               {filteredVisits.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-3 py-4 text-center text-red-500 bg-transparent">No visits in this range.</td>
+                  <td colSpan={isAuthenticated ? 4 : 3} className="px-3 py-4 text-center text-red-500 bg-transparent">No visits in this range.</td>
                 </tr>
               ) : (
                 filteredVisits.map((v, i) => {
@@ -358,6 +429,20 @@ export default function Analytics() {
                       <td className="px-3 py-2 whitespace-nowrap">{date}</td>
                       <td className="px-3 py-2 whitespace-nowrap">{time}</td>
                       <td className="px-3 py-2 break-all max-w-xs">{v.visitorId}</td>
+                      {isAuthenticated && (
+                        <td className="px-3 py-2 text-center">
+                          <button
+                            className="text-red-600 hover:text-white bg-transparent rounded-full p-1 transition-colors cursor-pointer"
+                            title="Delete this record"
+                            onClick={e => {
+                              e.stopPropagation();
+                              handleDeleteRecord(v.visitorId, v.lastVisit.toISOString());
+                            }}
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })
