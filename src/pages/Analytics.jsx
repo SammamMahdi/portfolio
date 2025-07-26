@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { useNavigate } from "react-router-dom";
 import { StarBackground } from "../components/StarBackground";
@@ -47,6 +47,8 @@ export default function Analytics() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
   const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -122,6 +124,16 @@ export default function Analytics() {
       };
     });
   }
+
+  // Filtered visits for the table
+  const filteredVisits = useMemo(() => {
+    return rawData.filter(v => {
+      const dateStr = v.lastVisit.toISOString().split("T")[0];
+      if (filterStartDate && dateStr < filterStartDate) return false;
+      if (filterEndDate && dateStr > filterEndDate) return false;
+      return true;
+    }).sort((a, b) => b.lastVisit - a.lastVisit); // newest first
+  }, [rawData, filterStartDate, filterEndDate]);
 
   return (
     <div className="min-h-screen w-full relative flex flex-col items-center justify-center bg-transparent">
@@ -255,6 +267,74 @@ export default function Analytics() {
               </ResponsiveContainer>
             )}
           </div>
+        </div>
+
+        {/* Visit Details Filters */}
+        <div className="w-full flex flex-wrap gap-2 justify-center items-center mt-8 mb-2">
+          <label className="text-sm text-white">Start Date:
+            <input
+              type="date"
+              value={filterStartDate}
+              onChange={e => setFilterStartDate(e.target.value)}
+              className="ml-2 px-2 py-1 rounded bg-gray-800 text-white border border-gray-700"
+              max={filterEndDate || undefined}
+            />
+          </label>
+          <label className="text-sm text-white">End Date:
+            <input
+              type="date"
+              value={filterEndDate}
+              onChange={e => setFilterEndDate(e.target.value)}
+              className="ml-2 px-2 py-1 rounded bg-gray-800 text-white border border-gray-700"
+              min={filterStartDate || undefined}
+            />
+          </label>
+          {(filterStartDate || filterEndDate) && (
+            <button
+              className="ml-2 px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer text-sm"
+              onClick={() => { setFilterStartDate(""); setFilterEndDate(""); }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* Visit Details Table */}
+        <div className="w-full overflow-x-auto mt-2 mb-8" style={{ ...glassStyle, border: '1.5px solid rgba(255,255,255,0.04)', boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}>
+          <table className="min-w-full text-sm text-left text-white rounded-xl overflow-hidden">
+            <thead>
+              <tr className="bg-gray-800/80">
+                <th className="px-3 py-2 font-semibold text-white">Date</th>
+                <th className="px-3 py-2 font-semibold text-white">Time</th>
+                <th className="px-3 py-2 font-semibold text-white">Visitor ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredVisits.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-3 py-4 text-center text-red-500 bg-transparent">No visits in this range.</td>
+                </tr>
+              ) : (
+                filteredVisits.map((v, i) => {
+                  const date = v.lastVisit.toLocaleDateString();
+                  const time = v.lastVisit.toLocaleTimeString();
+                  return (
+                    <tr
+                      key={v.visitorId + v.lastVisit.toISOString() + i}
+                      className={
+                        `transition-colors duration-150 ${i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-800/60"} hover:bg-red-600/30 hover:text-white`
+                      }
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <td className="px-3 py-2 whitespace-nowrap">{date}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{time}</td>
+                      <td className="px-3 py-2 break-all max-w-xs">{v.visitorId}</td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
