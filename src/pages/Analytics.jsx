@@ -4,21 +4,21 @@ import { useNavigate } from "react-router-dom";
 import { StarBackground } from "../components/StarBackground";
 
 const chartContainerStyle = {
-  maxWidth: 1400,
-  minHeight: 700,
-  margin: "4rem auto 4rem auto",
+  maxWidth: "100%",
+  minHeight: 400,
+  margin: "2rem auto",
   position: "relative",
   zIndex: 1,
 };
 
 const glassStyle = {
-  background: "rgba(24, 26, 32, 0.18)", // even more transparent
-  borderRadius: "1.25rem",
-  border: "1.5px solid rgba(255,255,255,0.04)", // even lighter border
+  background: "rgba(24, 26, 32, 0.18)",
+  borderRadius: "1rem",
+  border: "1.5px solid rgba(255,255,255,0.04)",
   boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
   backdropFilter: "blur(16px)",
   WebkitBackdropFilter: "blur(16px)",
-  padding: "2.5rem 2rem 2.5rem 2rem",
+  padding: "1.5rem",
   overflow: "hidden",
 };
 
@@ -44,7 +44,7 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState("Yearly");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // 1-based
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
   const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ export default function Analytics() {
       .then((res) => res.json())
       .then((res) => {
         console.log("Analytics response:", res);
-        setRawData(res.visits.map(v => ({ ...v, lastVisit: new Date(v.timestamp) })));
+        setRawData(res.visits.map(v => ({ ...v, lastVisit: new Date(v.lastVisit || v.timestamp) })));
         setLoading(false);
       })
       .catch((error) => {
@@ -123,122 +123,133 @@ export default function Analytics() {
     });
   }
 
-  // Responsive min width for chart area (for horizontal scroll)
-  let minChartWidth = 900;
-  if (view === "Daily") minChartWidth = 1200;
-  if (view === "Monthly") minChartWidth = 1200;
-  if (view === "Weekly") minChartWidth = 900;
-  if (view === "Yearly") minChartWidth = 900;
-
   return (
     <div className="min-h-screen w-full relative flex flex-col items-center justify-center bg-transparent">
       <StarBackground />
-      <div className="container mx-auto px-2 py-8 relative z-10">
-        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 32, alignItems: 'center' }}>
+      <div className="container mx-auto px-4 py-4 relative z-10">
+        {/* Header */}
+        <div className="flex flex-col items-center mb-6">
           <button
             onClick={() => navigate("/")}
-            style={{
-              background: "#ff1744",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              padding: "0.6rem 1.4rem",
-              fontWeight: 600,
-              fontSize: "1.1rem",
-              boxShadow: "0 0 8px #ff1744",
-              cursor: "pointer",
-              marginRight: 16,
-              transition: 'background 0.2s, color 0.2s',
-            }}
+            className="bg-red-600 hover:bg-red-700 text-white border-none rounded-md px-4 py-2 font-semibold text-lg shadow-lg cursor-pointer transition-colors mb-4"
           >
             ← Back
           </button>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">
+            Visitor Analytics
+          </h1>
+        </div>
+
+        {/* View Buttons */}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
           {VIEWS.map(v => (
             <button
               key={v}
               onClick={() => setView(v)}
-              style={{
-                background: view === v ? "#ff1744" : "#222",
-                color: view === v ? "#fff" : "#ff1744",
-                border: view === v ? "2px solid #ff1744" : "2px solid #222",
-                borderRadius: 6,
-                padding: "0.6rem 1.4rem",
-                fontWeight: 600,
-                fontSize: "1.1rem",
-                boxShadow: view === v ? "0 0 8px #ff1744" : "none",
-                cursor: "pointer",
-                marginRight: 0,
-                transition: 'background 0.2s, color 0.2s',
-              }}
+              className={`px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors ${
+                view === v 
+                  ? "bg-red-600 text-white border-2 border-red-600 shadow-lg" 
+                  : "bg-gray-800 text-red-600 border-2 border-gray-800"
+              }`}
             >
               {v}
             </button>
           ))}
         </div>
-        <h1 style={{ fontSize: "2.5rem", fontWeight: 700, marginBottom: "0.5rem", textAlign: "center" }}>
-          Visitor Analytics
-        </h1>
-        {view === "Daily" && (
-          <div style={{ textAlign: "center", color: "#ff1744", marginBottom: 12, fontWeight: 500, fontSize: "1.2rem" }}>
-            {`Visits for ${pad(selectedDay)}/${pad(selectedMonth)}/${selectedYear}`}
-          </div>
-        )}
-        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 32 }}>
-          <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
+
+        {/* Date Selection */}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
+          <select 
+            value={selectedYear} 
+            onChange={e => setSelectedYear(Number(e.target.value))} 
+            className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
+          >
             {years.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
+          
           {(view === "Monthly" || view === "Daily") && (
-            <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
+            <select 
+              value={selectedMonth} 
+              onChange={e => setSelectedMonth(Number(e.target.value))} 
+              className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
+            >
               {months.map(m => <option key={m} value={m}>{pad(m)}</option>)}
             </select>
           )}
+          
           {view === "Daily" && (
-            <select value={selectedDay} onChange={e => setSelectedDay(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
+            <select 
+              value={selectedDay} 
+              onChange={e => setSelectedDay(Number(e.target.value))} 
+              className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
+            >
               {days.map(d => <option key={d} value={d}>{pad(d)}</option>)}
             </select>
           )}
+          
           {view === "Weekly" && (
-            <select value={selectedWeek} onChange={e => setSelectedWeek(Number(e.target.value))} style={{ padding: 8, borderRadius: 4, background: "#222", color: "#fff", border: "1px solid #ff1744", fontSize: "1.1rem" }}>
+            <select 
+              value={selectedWeek} 
+              onChange={e => setSelectedWeek(Number(e.target.value))} 
+              className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
+            >
               {weeks.map(w => <option key={w} value={w}>Week {w}</option>)}
             </select>
           )}
         </div>
-        <div
-          className="bg-card border border-border rounded-xl shadow-lg flex items-center justify-center overflow-x-auto"
-          style={{ ...chartContainerStyle, ...glassStyle }}
-        >
-          <div style={{ minWidth: minChartWidth, width: "100%" }}>
+
+        {/* Date Display */}
+        {view === "Daily" && (
+          <div className="text-center text-red-600 mb-4 font-medium text-lg">
+            {`Visits for ${pad(selectedDay)}/${pad(selectedMonth)}/${selectedYear}`}
+          </div>
+        )}
+
+        {/* Chart Container */}
+        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-lg overflow-hidden" style={{ ...chartContainerStyle, ...glassStyle }}>
+          <div className="w-full h-full">
             {loading ? (
-              <div style={{ textAlign: "center", color: "#ff1744" }}>Loading chart...</div>
+              <div className="flex items-center justify-center h-64 text-red-600 text-lg">
+                Loading chart...
+              </div>
             ) : chartData.every(d => d.count === 0) ? (
-              <div style={{ textAlign: "center", color: "#ff1744" }}>No visits for this {view.toLowerCase()}.</div>
+              <div className="flex items-center justify-center h-64 text-red-600 text-lg">
+                No visits for this {view.toLowerCase()}.
+              </div>
             ) : (
-              <ResponsiveContainer width="100%" height={600}>
-                <LineChart data={chartData} margin={{ top: 60, right: 60, left: 20, bottom: 60 }}>
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={chartData} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
                   <CartesianGrid stroke="#ff1744" strokeOpacity={0.25} strokeDasharray="3 3" />
                   <XAxis
                     dataKey="label"
                     stroke="#fff"
-                    tick={{ fill: "#fff", fontSize: 16 }}
+                    tick={{ fill: "#fff", fontSize: 12 }}
                     interval={0}
-                    angle={-30}
+                    angle={-45}
                     textAnchor="end"
-                    height={70}
-                    ticks={chartData.map(d => d.label)}
+                    height={60}
                   />
                   <YAxis
                     stroke="#fff"
-                    tick={{ fill: "#fff", fontSize: 18 }}
+                    tick={{ fill: "#fff", fontSize: 14 }}
                     allowDecimals={false}
-                    label={{ value: 'Visits', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 20 }}
+                    label={{ value: 'Unique Visitors', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 16 }}
                   />
                   <Tooltip
                     contentStyle={{ background: "#222", border: "1px solid #ff1744", color: "#fff" }}
                     labelStyle={{ color: "#ff1744" }}
-                    formatter={(value) => [value, 'Visits']}
+                    formatter={(value) => [value, 'Unique Visitors']}
                     labelFormatter={(label) => view === "Daily" ? `Hour: ${label}` : label}
                   />
-                  <Line type="monotone" dataKey="count" stroke="#ff1744" strokeWidth={3} dot={{ r: 6, fill: "#ff1744", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 9 }} style={neonLineStyle} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="count" 
+                    stroke="#ff1744" 
+                    strokeWidth={3} 
+                    dot={{ r: 4, fill: "#ff1744", stroke: "#fff", strokeWidth: 2 }} 
+                    activeDot={{ r: 6 }} 
+                    style={neonLineStyle} 
+                  />
                 </LineChart>
               </ResponsiveContainer>
             )}
