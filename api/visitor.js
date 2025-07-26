@@ -24,24 +24,39 @@ export default async function handler(req, res) {
 
   console.log("Visitor API called");
 
+  const visitorId = req.headers["x-visitor-id"];
+  console.log("Received visitorId:", visitorId);
+
+  if (!visitorId) {
+    console.log("Missing visitorId header");
+    return res.status(400).json({ error: "Missing visitor ID" });
+  }
+
   try {
     const client = await connectToDatabase();
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    // Add a new view entry with timestamp
-    const result = await collection.insertOne({
-      timestamp: new Date(),
-      date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
-    });
+    // Upsert the visitor ID (insert if not exists, update lastVisit if exists)
+    const result = await collection.updateOne(
+      { visitorId },
+      { 
+        $set: { 
+          visitorId, 
+          lastVisit: new Date(),
+          date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+        } 
+      },
+      { upsert: true }
+    );
 
-    console.log("Inserted view:", result);
+    console.log("Upsert result:", result);
 
-    // Get total view count
-    const totalViews = await collection.countDocuments();
+    // Count unique visitors
+    const uniqueVisitors = await collection.countDocuments();
 
-    console.log("Total views:", totalViews);
-    res.status(200).json({ totalViews });
+    console.log("Unique visitors:", uniqueVisitors);
+    res.status(200).json({ uniqueVisitors });
   } catch (error) {
     console.error("Database error:", error);
     res.status(500).json({ error: "Database error" });
