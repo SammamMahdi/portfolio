@@ -76,7 +76,13 @@ export default function Analytics() {
   if (view === "Yearly") {
     const grouped = {};
     for (let m = 1; m <= 12; m++) grouped[m] = 0;
-    rawData.filter(v => v.lastVisit.getFullYear() === selectedYear).forEach(v => {
+    rawData.filter(v => {
+      // Check if lastVisit is a valid date
+      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
+        return false;
+      }
+      return v.lastVisit.getFullYear() === selectedYear;
+    }).forEach(v => {
       const month = v.lastVisit.getMonth() + 1;
       grouped[month]++;
     });
@@ -88,7 +94,13 @@ export default function Analytics() {
     const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
     const grouped = {};
     for (let d = 1; d <= daysInMonth; d++) grouped[d] = 0;
-    rawData.filter(v => v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth).forEach(v => {
+    rawData.filter(v => {
+      // Check if lastVisit is a valid date
+      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
+        return false;
+      }
+      return v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth;
+    }).forEach(v => {
       const day = v.lastVisit.getDate();
       grouped[day]++;
     });
@@ -99,7 +111,13 @@ export default function Analytics() {
   } else if (view === "Weekly") {
     const grouped = {};
     for (let d = 0; d < 7; d++) grouped[d] = 0;
-    rawData.filter(v => v.lastVisit.getFullYear() === selectedYear && getWeekNumber(v.lastVisit) === selectedWeek).forEach(v => {
+    rawData.filter(v => {
+      // Check if lastVisit is a valid date
+      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
+        return false;
+      }
+      return v.lastVisit.getFullYear() === selectedYear && getWeekNumber(v.lastVisit) === selectedWeek;
+    }).forEach(v => {
       const day = v.lastVisit.getDay();
       grouped[day]++;
     });
@@ -110,7 +128,13 @@ export default function Analytics() {
   } else if (view === "Daily") {
     const grouped = {};
     for (let h = 0; h < 24; h++) grouped[h] = 0;
-    rawData.filter(v => v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth && v.lastVisit.getDate() === selectedDay).forEach(v => {
+    rawData.filter(v => {
+      // Check if lastVisit is a valid date
+      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
+        return false;
+      }
+      return v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth && v.lastVisit.getDate() === selectedDay;
+    }).forEach(v => {
       const hour = v.lastVisit.getHours();
       grouped[hour]++;
     });
@@ -128,6 +152,11 @@ export default function Analytics() {
   // Filtered visits for the table
   const filteredVisits = useMemo(() => {
     return rawData.filter(v => {
+      // Check if lastVisit is a valid date
+      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
+        return false;
+      }
+      
       const dateStr = v.lastVisit.toISOString().split("T")[0];
       if (filterStartDate && dateStr < filterStartDate) return false;
       if (filterEndDate && dateStr > filterEndDate) return false;
