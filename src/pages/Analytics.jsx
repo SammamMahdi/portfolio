@@ -129,19 +129,20 @@ export default function Analytics() {
       <div className="container mx-auto px-4 py-4 relative z-10">
         {/* Header */}
         <div className="flex flex-col items-center mb-6">
-          <button
-            onClick={() => navigate("/")}
-            className="bg-red-600 hover:bg-red-700 text-white border-none rounded-md px-4 py-2 font-semibold text-lg shadow-lg cursor-pointer transition-colors mb-4"
-          >
-            ← Back
-          </button>
           <h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">
             Visitor Analytics
           </h1>
         </div>
 
-        {/* View Buttons */}
+        {/* View Buttons + Back Button */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
+          <button
+            onClick={() => navigate("/")}
+            className="px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors bg-gray-800 text-red-600 border-2 border-gray-800 order-first"
+            style={{ minWidth: 80 }}
+          >
+            ← Back
+          </button>
           {VIEWS.map(v => (
             <button
               key={v}
