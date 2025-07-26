@@ -57,56 +57,44 @@ export default function Analytics() {
   const [filterStartDate, setFilterStartDate] = useState("");
   const [filterEndDate, setFilterEndDate] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState("");
   const navigate = useNavigate();
 
+  // Authentication logic
   useEffect(() => {
-    // Check if user is authenticated (has entered correct PIN)
     const authStatus = sessionStorage.getItem('analytics_authenticated');
-    let authenticated = false;
     if (authStatus === 'true') {
       setIsAuthenticated(true);
-      authenticated = true;
-    } else {
-      // Prompt for PIN
-      const pin = window.prompt("Enter PIN to view analytics:");
-      if (pin === "621311518") {
-        setIsAuthenticated(true);
-        sessionStorage.setItem('analytics_authenticated', 'true');
-        authenticated = true;
-      } else {
-        navigate("/");
-        return;
-      }
     }
+  }, []);
 
+  // Data fetching and auto-delete logic
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    setLoading(true);
     fetch("/api/visitor-analytics")
       .then((res) => res.json())
       .then(async (res) => {
         const visits = res.visits.map(v => ({ ...v, lastVisit: new Date(v.lastVisit || v.timestamp) }));
         setRawData(visits);
         setLoading(false);
-
         // After authentication, auto-delete this user's most recent record if it exists
-        if (authenticated) {
-          const visitorId = getCookie('unique_visitor_id');
-          if (visitorId) {
-            // Find the most recent record for this visitorId
-            const myRecords = visits.filter(v => v.visitorId === visitorId);
-            if (myRecords.length > 0) {
-              // Sort by lastVisit descending
-              myRecords.sort((a, b) => b.lastVisit - a.lastVisit);
-              const myLatest = myRecords[0];
-              // Delete it
-              try {
-                await fetch("/api/delete-visitor", {
-                  method: "DELETE",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ _id: myLatest._id })
-                });
-                setRawData(prev => prev.filter(v => v._id !== myLatest._id));
-              } catch (err) {
-                // Ignore error
-              }
+        const visitorId = getCookie('unique_visitor_id');
+        if (visitorId) {
+          const myRecords = visits.filter(v => v.visitorId === visitorId);
+          if (myRecords.length > 0) {
+            myRecords.sort((a, b) => b.lastVisit - a.lastVisit);
+            const myLatest = myRecords[0];
+            try {
+              await fetch("/api/delete-visitor", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ _id: myLatest._id })
+              });
+              setRawData(prev => prev.filter(v => v._id !== myLatest._id));
+            } catch (err) {
+              // Ignore error
             }
           }
         }
@@ -115,7 +103,19 @@ export default function Analytics() {
         console.error("Analytics error:", error);
         setLoading(false);
       });
-  }, [navigate]);
+  }, [isAuthenticated]);
+
+  // PIN modal submit handler
+  const handlePinSubmit = (e) => {
+    e.preventDefault();
+    if (pinInput === "621311518") {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('analytics_authenticated', 'true');
+      setPinError("");
+    } else {
+      setPinError("Incorrect PIN. Please try again.");
+    }
+  };
 
   // Get available years, months, weeks, days from data
   const years = Array.from(new Set(rawData.map(v => v.lastVisit.getFullYear()))).sort((a, b) => b - a);
@@ -256,6 +256,32 @@ export default function Analytics() {
       alert("Error deleting record.");
     }
   };
+
+  // PIN Modal
+  if (!isAuthenticated) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+        <form onSubmit={handlePinSubmit} className="bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col items-center border border-red-600 min-w-[280px]">
+          <h2 className="text-xl font-bold mb-4 text-white">Enter Analytics PIN</h2>
+          <input
+            type="password"
+            value={pinInput}
+            onChange={e => setPinInput(e.target.value)}
+            className="px-4 py-2 rounded border border-gray-700 bg-gray-800 text-white mb-2 w-full text-center"
+            placeholder="PIN"
+            autoFocus
+          />
+          {pinError && <div className="text-red-500 mb-2 text-sm">{pinError}</div>}
+          <button
+            type="submit"
+            className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-md font-semibold transition-colors cursor-pointer border-2 border-red-600 w-full mt-2"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full relative flex flex-col items-center justify-center bg-transparent">
