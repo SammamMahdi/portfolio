@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const client = await connectToDatabase();
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
-    const visits = await collection.find({}, { projection: { _id: 0, visitorId: 1, lastVisit: 1 } }).toArray();
+    const visits = await collection.find({}, { projection: { _id: 1, visitorId: 1, lastVisit: 1, timestamp: 1 } }).toArray();
     console.log("Found unique visitors:", visits.length);
     res.status(200).json({ visits });
   } catch (error) {

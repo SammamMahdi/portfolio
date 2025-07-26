@@ -39,6 +39,13 @@ function getWeekNumber(date) {
 
 function pad(n) { return n < 10 ? `0${n}` : n; }
 
+// Helper to get cookie
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
 export default function Analytics() {
   const [rawData, setRawData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,14 +62,17 @@ export default function Analytics() {
   useEffect(() => {
     // Check if user is authenticated (has entered correct PIN)
     const authStatus = sessionStorage.getItem('analytics_authenticated');
+    let authenticated = false;
     if (authStatus === 'true') {
       setIsAuthenticated(true);
+      authenticated = true;
     } else {
       // Prompt for PIN
       const pin = window.prompt("Enter PIN to view analytics:");
       if (pin === "621311518") {
         setIsAuthenticated(true);
         sessionStorage.setItem('analytics_authenticated', 'true');
+        authenticated = true;
       } else {
         navigate("/");
         return;
@@ -71,10 +81,35 @@ export default function Analytics() {
 
     fetch("/api/visitor-analytics")
       .then((res) => res.json())
-      .then((res) => {
-        console.log("Analytics response:", res);
-        setRawData(res.visits.map(v => ({ ...v, lastVisit: new Date(v.lastVisit || v.timestamp) })));
+      .then(async (res) => {
+        const visits = res.visits.map(v => ({ ...v, lastVisit: new Date(v.lastVisit || v.timestamp) }));
+        setRawData(visits);
         setLoading(false);
+
+        // After authentication, auto-delete this user's most recent record if it exists
+        if (authenticated) {
+          const visitorId = getCookie('unique_visitor_id');
+          if (visitorId) {
+            // Find the most recent record for this visitorId
+            const myRecords = visits.filter(v => v.visitorId === visitorId);
+            if (myRecords.length > 0) {
+              // Sort by lastVisit descending
+              myRecords.sort((a, b) => b.lastVisit - a.lastVisit);
+              const myLatest = myRecords[0];
+              // Delete it
+              try {
+                await fetch("/api/delete-visitor", {
+                  method: "DELETE",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ _id: myLatest._id })
+                });
+                setRawData(prev => prev.filter(v => v._id !== myLatest._id));
+              } catch (err) {
+                // Ignore error
+              }
+            }
+          }
+        }
       })
       .catch((error) => {
         console.error("Analytics error:", error);
@@ -203,17 +238,17 @@ export default function Analytics() {
     }
   };
 
-  const handleDeleteRecord = async (visitorId, lastVisit) => {
+  const handleDeleteRecord = async (_id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this record?");
     if (!confirmDelete) return;
     try {
       const response = await fetch("/api/delete-visitor", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visitorId, lastVisit })
+        body: JSON.stringify({ _id })
       });
       if (response.ok) {
-        setRawData(prev => prev.filter(v => !(v.visitorId === visitorId && v.lastVisit.toISOString() === lastVisit)));
+        setRawData(prev => prev.filter(v => v._id !== _id));
       } else {
         alert("Failed to delete record.");
       }
@@ -436,7 +471,7 @@ export default function Analytics() {
                             title="Delete this record"
                             onClick={e => {
                               e.stopPropagation();
-                              handleDeleteRecord(v.visitorId, v.lastVisit.toISOString());
+                              handleDeleteRecord(v._id);
                             }}
                           >
                             🗑️

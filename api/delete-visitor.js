@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
 const dbName = "portfolio";
@@ -22,9 +22,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { visitorId, lastVisit } = req.body;
-  if (!visitorId || !lastVisit) {
-    return res.status(400).json({ error: "Missing visitorId or lastVisit" });
+  const { _id } = req.body;
+  if (!_id) {
+    return res.status(400).json({ error: "Missing _id" });
   }
 
   try {
@@ -32,11 +32,8 @@ export default async function handler(req, res) {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    // Delete the document matching visitorId and lastVisit
-    const result = await collection.deleteOne({
-      visitorId,
-      lastVisit: new Date(lastVisit)
-    });
+    // Delete the document by _id
+    const result = await collection.deleteOne({ _id: new ObjectId(_id) });
 
     if (result.deletedCount === 1) {
       res.status(200).json({ success: true });
