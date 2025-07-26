@@ -138,7 +138,7 @@ export default function Analytics() {
         <div className="flex flex-wrap justify-center gap-2 mb-6">
           <button
             onClick={() => navigate("/")}
-            className="px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors bg-gray-800 text-red-600 border-2 border-gray-800 order-first"
+            className="px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors bg-gray-800 text-red-600 border-2 border-gray-800 order-first hover:bg-red-600 hover:text-white hover:border-red-600 cursor-pointer"
             style={{ minWidth: 80 }}
           >
             ← Back
@@ -147,10 +147,10 @@ export default function Analytics() {
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors ${
+              className={`px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors cursor-pointer ${
                 view === v 
                   ? "bg-red-600 text-white border-2 border-red-600 shadow-lg" 
-                  : "bg-gray-800 text-red-600 border-2 border-gray-800"
+                  : "bg-gray-800 text-red-600 border-2 border-gray-800 hover:bg-red-600 hover:text-white hover:border-red-600"
               }`}
             >
               {v}
