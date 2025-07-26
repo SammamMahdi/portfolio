@@ -1,36 +1,9 @@
 import { ArrowUp } from "lucide-react";
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-
-// Helper to generate UUID (v4)
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
-// Helper to get/set cookie
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-}
-function setCookie(name, value, days = 365) {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-}
 
 export const Footer = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let uuid = getCookie('unique_visitor_id');
-    if (!uuid) {
-      uuid = generateUUID();
-      setCookie('unique_visitor_id', uuid);
-    }
-  }, []);
 
   const handleCounterClick = () => {
     const pin = window.prompt("Enter PIN to view analytics:");

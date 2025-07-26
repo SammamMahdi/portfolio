@@ -53,7 +53,7 @@ export default function Analytics() {
     fetch("/api/visitor-analytics")
       .then((res) => res.json())
       .then((res) => {
-        setRawData(res.visits.map(v => ({ ...v, lastVisit: new Date(v.lastVisit) })));
+        setRawData(res.visits.map(v => ({ ...v, lastVisit: new Date(v.timestamp) })));
         setLoading(false);
       })
       .catch(() => setLoading(false));

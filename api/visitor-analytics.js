@@ -8,7 +8,7 @@ let cachedClient = null;
 
 async function connectToDatabase() {
   if (cachedClient) return cachedClient;
-  const client = new MongoClient(uri); // No options needed
+  const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
   return client;
@@ -19,8 +19,8 @@ export default async function handler(req, res) {
     const client = await connectToDatabase();
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
-    const visits = await collection.find({}, { projection: { _id: 0, visitorId: 1, lastVisit: 1 } }).toArray();
-    res.status(200).json({ visits });
+    const views = await collection.find({}, { projection: { _id: 0, timestamp: 1, date: 1 } }).toArray();
+    res.status(200).json({ visits: views });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Database error" });
