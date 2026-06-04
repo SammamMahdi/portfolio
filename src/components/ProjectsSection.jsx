@@ -15,12 +15,27 @@ export const ProjectsSection = () => {
   const [tappedIdx, setTappedIdx] = useState(null);
 
   useEffect(() => {
-    fetch("https://corsproxy.io/?https://api.github.com/users/SammamMahdi/repos?sort=updated&per_page=30")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch repos");
+    // GitHub's REST API sends `Access-Control-Allow-Origin: *`, so we can call
+    // it directly from the browser — no CORS proxy needed.
+    fetch("https://api.github.com/users/SammamMahdi/repos?sort=updated&per_page=30", {
+      headers: { Accept: "application/vnd.github+json" },
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          // 403 with a zero remaining quota means the unauthenticated rate
+          // limit (60/hour per IP) was hit, not a real failure.
+          if (res.status === 403 && res.headers.get("X-RateLimit-Remaining") === "0") {
+            throw new Error("GitHub rate limit reached — please try again in a little while.");
+          }
+          throw new Error(`Failed to fetch repos (HTTP ${res.status})`);
+        }
         return res.json();
       })
       .then((data) => {
+        // The API returns an array on success; an object (e.g. { message }) on error.
+        if (!Array.isArray(data)) {
+          throw new Error(data?.message || "Unexpected response from GitHub.");
+        }
         // Sort pinned repos first, in the order specified
         const pinned = pinnedRepos
           .map(name => data.find(repo => repo.name === name))
