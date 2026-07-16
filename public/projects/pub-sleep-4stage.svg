@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1120"/>
+      <stop offset="55%" stop-color="#0a0f1c"/>
+      <stop offset="100%" stop-color="#140b12"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="18%" cy="0%" r="85%">
+      <stop offset="0%" stop-color="#dc2626" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0 L0 0 0 30" fill="none" stroke="#dc2626" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+  <rect width="1200" height="675" fill="url(#glow)"/>
+  <rect x="0" y="0" width="6" height="675" fill="#dc2626"/>
+  <text x="56" y="74" fill="#dc2626" font-size="17" font-weight="700" letter-spacing="3.5">IEEE ICEACE 2024 · CHANGCHUN, CHINA</text>
+  <text x="56" y="124" fill="#f1f5f9" font-size="38" font-weight="800">Four-Stage Sleep Classification from PPG</text>
+  <line x1="56" y1="150" x2="1144" y2="150" stroke="#dc2626" stroke-opacity="0.25" stroke-width="1.5"/>
+
+  <rect x="56" y="196" width="1088" height="120" rx="14" fill="#111827" stroke="#dc2626" stroke-opacity="0.30"/>
+  <text x="76" y="222" fill="#94a3b8" font-size="13" letter-spacing="1.5">PHOTOPLETHYSMOGRAPHY SIGNAL</text>
+  <path d="M 76 285 L 87.6 259.4 L 99.3 256.2 L 110.9 275.4 L 122.6 273.8 L 134.2 273.2 L 145.9 273.8 L 157.5 275.5 L 169.2 278.1 L 180.8 281.4 L 192.4 284.9 L 204.1 266.7 L 215.7 270.0 L 227.4 294.4 L 239.0 296.2 L 250.7 296.8 L 262.3 296.2 L 274.0 294.5 L 285.6 291.9 L 297.2 288.6 L 308.9 284.9 L 320.5 259.4 L 332.2 256.2 L 343.8 275.4 L 355.5 273.8 L 367.1 273.2 L 378.8 273.8 L 390.4 275.5 L 402.0 278.1 L 413.7 281.4 L 425.3 284.9 L 437.0 266.7 L 448.6 270.0 L 460.3 294.4 L 471.9 296.2 L 483.6 296.8 L 495.2 296.2 L 506.8 294.5 L 518.5 291.9 L 530.1 288.6 L 541.8 284.9 L 553.4 259.4 L 565.1 256.2 L 576.7 275.4 L 588.4 273.8 L 600.0 273.2 L 611.6 273.8 L 623.3 275.5 L 634.9 278.1 L 646.6 281.4 L 658.2 284.9 L 669.9 266.7 L 681.5 270.0 L 693.2 294.4 L 704.8 296.2 L 716.4 296.8 L 728.1 296.2 L 739.7 294.5 L 751.4 291.9 L 763.0 288.6 L 774.7 284.9 L 786.3 259.4 L 798.0 256.2 L 809.6 275.4 L 821.2 273.8 L 832.9 273.2 L 844.5 273.8 L 856.2 275.5 L 867.8 278.1 L 879.5 281.4 L 891.1 284.9 L 902.8 266.7 L 914.4 270.0 L 926.0 294.4 L 937.7 296.2 L 949.3 296.8 L 961.0 296.2 L 972.6 294.5 L 984.3 291.9 L 995.9 288.6 L 1007.6 284.9 L 1019.2 259.4 L 1030.8 256.2 L 1042.5 275.4 L 1054.1 273.8 L 1065.8 273.2 L 1077.4 273.8 L 1089.1 275.5 L 1100.7 278.1 L 1112.4 281.4 L 1124.0 284.9" fill="none" stroke="#dc2626" stroke-opacity="0.95" stroke-width="2.5" filter="url(#soft)"/>
+  <rect x="56" y="352" width="336" height="104" rx="14" fill="#111827" stroke="#dc2626" stroke-opacity="0.35" stroke-width="1.5"/>
+  <text x="224" y="386" fill="#f1f5f9" font-size="17" font-weight="700" text-anchor="middle">Feature Extraction</text>
+  <text x="224" y="410" fill="#94a3b8" font-size="13.5" text-anchor="middle">temporal + spectral</text>
+  <line x1="398" y1="404" x2="426" y2="404" stroke="#dc2626" stroke-opacity="0.75" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect x="432" y="352" width="336" height="104" rx="14" fill="#1c1117" stroke="#dc2626" stroke-opacity="0.85" stroke-width="2"/>
+  <text x="600" y="386" fill="#f1f5f9" font-size="17" font-weight="700" text-anchor="middle">ML Classifier</text>
+  <text x="600" y="410" fill="#94a3b8" font-size="13.5" text-anchor="middle">stage prediction</text>
+  <line x1="774" y1="404" x2="802" y2="404" stroke="#dc2626" stroke-opacity="0.75" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect x="808" y="352" width="336" height="104" rx="14" fill="#1c1117" stroke="#dc2626" stroke-opacity="0.85" stroke-width="2"/>
+  <text x="976" y="386" fill="#f1f5f9" font-size="17" font-weight="700" text-anchor="middle">Explainable AI</text>
+  <text x="976" y="410" fill="#94a3b8" font-size="13.5" text-anchor="middle">driver attribution</text>
+  <text x="56" y="500" fill="#94a3b8" font-size="15">Four sleep stages resolved from a low-cost optical sensor, with XAI exposing which</text>
+  <text x="56" y="524" fill="#94a3b8" font-size="15">physiological signals drive each staging decision.</text>
+  <rect x="56" y="552" width="48.8" height="34" rx="17" fill="#dc2626" fill-opacity="0.10" stroke="#dc2626" stroke-opacity="0.35"/>
+  <text x="80.4" y="574" fill="#f87171" font-size="13.5" font-weight="600" text-anchor="middle">Wake</text>
+  <rect x="116.8" y="552" width="57" height="34" rx="17" fill="#dc2626" fill-opacity="0.10" stroke="#dc2626" stroke-opacity="0.35"/>
+  <text x="145.3" y="574" fill="#f87171" font-size="13.5" font-weight="600" text-anchor="middle">Light</text>
+  <rect x="185.8" y="552" width="48.8" height="34" rx="17" fill="#dc2626" fill-opacity="0.10" stroke="#dc2626" stroke-opacity="0.35"/>
+  <text x="210.20000000000002" y="574" fill="#f87171" font-size="13.5" font-weight="600" text-anchor="middle">Deep</text>
+  <rect x="246.60000000000002" y="552" width="40.599999999999994" height="34" rx="17" fill="#dc2626" fill-opacity="0.10" stroke="#dc2626" stroke-opacity="0.35"/>
+  <text x="266.90000000000003" y="574" fill="#f87171" font-size="13.5" font-weight="600" text-anchor="middle">REM</text>
+  <text x="56" y="641" fill="#64748b" font-size="15" font-style="italic">Conceptual schematic — not a figure from the published paper.</text>
+</svg>

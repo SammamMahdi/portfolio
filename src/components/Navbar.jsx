@@ -2,15 +2,19 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { MobileNavbar } from "./MobileNavbar";
 
+// Mirrors the CV's section order.
 const navItems = [
   { name: "Home", href: "#hero", id: "hero" },
+  { name: "Introduction", href: "#about", id: "about" },
+  { name: "Interests", href: "#research-interests", id: "research-interests" },
   { name: "Education", href: "#education", id: "education" },
+  { name: "Teaching", href: "#teaching", id: "teaching" },
+  { name: "Publications", href: "#publications", id: "publications" },
+  { name: "Research", href: "#research-projects", id: "research-projects" },
   { name: "Skills", href: "#skills", id: "skills" },
   { name: "Projects", href: "#projects", id: "projects" },
-  { name: "Work Experience", href: "#work-experience", id: "work-experience" },
-  { name: "Publications", href: "#publications", id: "publications" },
-  { name: "Activities", href: "#activities", id: "activities" },
   { name: "Awards", href: "#awards", id: "awards" },
+  { name: "Activities", href: "#activities", id: "activities" },
   { name: "Contact", href: "#contact", id: "contact" },
 ];
 
@@ -34,26 +38,26 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // Improved scrollspy logic: uses scroll event and section positions
+  // Scrollspy: the active item is the last section whose top has passed the
+  // navbar. Tracking "last passed" rather than "currently straddling" keeps a
+  // sensible item lit even when no section boundary sits at the threshold.
   useEffect(() => {
     const handleScrollSpy = () => {
-      const sectionIds = navItems.map((item) => item.id);
-      const sections = sectionIds
-        .map((id) => document.getElementById(id))
+      const sections = navItems
+        .map((item) => document.getElementById(item.id))
         .filter(Boolean);
-      const scrollY = window.scrollY;
-      let active = sectionIds[0];
-      for (let i = 0; i < sections.length; i++) {
-        const rect = sections[i].getBoundingClientRect();
-        // If top is above the top of the viewport but not too far above, mark as active
-        if (rect.top <= 80 && rect.bottom > 80) {
-          active = sections[i].id;
-          break;
-        }
-        // If at the bottom of the page, set last section as active
-        if (window.innerHeight + scrollY >= document.body.offsetHeight - 2) {
-          active = sectionIds[sectionIds.length - 1];
-        }
+      if (!sections.length) return;
+
+      // Bottom of the page: the final section can be too short to ever pass
+      // the threshold, so surface it explicitly.
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 2) {
+        setActiveSection(sections[sections.length - 1].id);
+        return;
+      }
+
+      let active = sections[0].id;
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= 80) active = section.id;
       }
       setActiveSection(active);
     };
@@ -85,13 +89,13 @@ export const Navbar = () => {
               Portfolio
             </span>
           </a>
-          <div className="flex space-x-2 lg:space-x-6">
+          <div className="flex space-x-1 lg:space-x-2">
             {navItems.map((item, key) => (
               <a
                 key={key}
                 href={item.href}
                 className={cn(
-                  "group relative px-3 py-2 pb-1 text-base font-medium rounded-lg transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  "group relative px-2.5 py-2 pb-1 text-sm font-medium rounded-lg transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary whitespace-nowrap",
                   "hover:text-primary focus:text-primary",
                   activeSection === item.id
                     ? "text-primary neon-glow"

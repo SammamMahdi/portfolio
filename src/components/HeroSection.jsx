@@ -1,6 +1,21 @@
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, GraduationCap, Github, Linkedin, Mail } from "lucide-react";
 import profileImg from "../assets/profile.jpg";
 import { motion } from "framer-motion";
+import { profile, phdStatement } from "@/data/portfolio";
+
+/** Google Scholar's quadrangle mark — lucide has no equivalent. */
+const ScholarIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+    <path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 3.94A8 8 0 0 1 12 9a8 8 0 0 1 7.162 4.44L24 9.5z" />
+  </svg>
+);
+
+const socials = [
+  { href: profile.github, icon: Github, label: "GitHub" },
+  { href: profile.linkedin, icon: Linkedin, label: "LinkedIn" },
+  { href: profile.scholar, icon: ScholarIcon, label: "Google Scholar" },
+  { href: `mailto:${profile.email}`, icon: Mail, label: "Email" },
+];
 
 export const HeroSection = () => {
   return (
@@ -43,16 +58,53 @@ export const HeroSection = () => {
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto opacity-0 animate-fade-in-delay-3">
-            Driven Computer Science student passionate about coding and innovation. Experienced in Machine Learning, Artificial Intelligence, and hands-on research. Always building, always learning, always pushing boundaries.
+          <p className="text-base md:text-lg text-primary font-semibold tracking-wide">
+            {profile.role}
           </p>
 
+          {/* Profiles */}
+          <div className="flex items-center justify-center gap-3">
+            {socials.map(({ href, icon: Icon, label }) => (
+              <a
+                key={label}
+                href={href}
+                target={href.startsWith("mailto:") ? undefined : "_blank"}
+                rel="noopener noreferrer"
+                aria-label={label}
+                title={label}
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-primary/25 bg-black/40 text-foreground/80 backdrop-blur transition-all duration-300 hover:scale-110 hover:border-primary hover:text-primary hover:shadow-[0_0_18px_rgba(220,38,38,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <Icon className="h-5 w-5" />
+              </a>
+            ))}
+          </div>
+
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto opacity-0 animate-fade-in-delay-3">
+            {profile.headline}
+          </p>
+
+          {/* PhD availability */}
+          <a
+            href="#research-interests"
+            className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary text-sm font-semibold backdrop-blur hover:bg-primary/20 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+            </span>
+            <GraduationCap size={16} />
+            {phdStatement.headline}
+          </a>
+
           <div className="pt-4 opacity-0 animate-fade-in-delay-4 flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#projects" className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black/60 backdrop-blur text-primary font-bold text-lg shadow-lg border border-white/10 hover:bg-black/80 neon-glow transition-all duration-300 transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary">
-              View My Work
+            <a href="#about" className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black/60 backdrop-blur text-primary font-bold text-lg shadow-lg border border-white/10 hover:bg-black/80 neon-glow transition-all duration-300 transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary">
+              About Me
+            </a>
+            <a href="#publications" className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black/60 backdrop-blur text-primary font-bold text-lg shadow-lg border border-white/10 hover:bg-black/80 neon-glow transition-all duration-300 transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary">
+              Publications
             </a>
             <a
-              href="/sammamcv.pdf"
+              href={profile.cv}
               download
               className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black/60 backdrop-blur text-primary font-bold text-lg shadow-lg border border-white/10 hover:bg-black/80 neon-glow transition-all duration-300 transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary"
             >

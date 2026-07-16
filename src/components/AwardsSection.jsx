@@ -1,157 +1,80 @@
 import { motion } from "framer-motion";
-import { Trophy, Calendar, Star } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Calendar } from "lucide-react";
+import { awards } from "@/data/portfolio";
 
-const awards = [
-  { 
-    icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
-    title: "Duke of Edinburgh Award", 
-    extra: " (Bronze)",
-    type: "Achievement",
-    year: "2023"
-  },
-  { 
-    icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
-    title: "HULT Prize Semi-Finalist", 
-    extra: " at BRAC University",
-    type: "Competition",
-    year: "2023"
-  },
-  { 
-    icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
-    title: "Edexcel High Achievers' Awards",
-    type: "Academic",
-    year: "2022"
-  },
-  { 
-    icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
-    title: "Daily Star Awards",
-    type: "Recognition",
-    year: "2019 & 2022"
-  },
-  { 
-    icon: <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(220,38,38,0.7)]" />, 
-    title: "Academia High Achievers' Award",
-    type: "Academic",
-    year: "2019 & 2022"
-  },
-];
+const typeStyles = {
+  Academic: "bg-yellow-500/15 text-yellow-500 border-yellow-500/30",
+  Competition: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+  Achievement: "bg-green-500/15 text-green-500 border-green-500/30",
+};
 
 export const AwardsSection = () => {
-  const [tappedIdx, setTappedIdx] = useState(null);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  
-  useEffect(() => {
-    setIsTouchDevice(
-      typeof window !== 'undefined' &&
-      ('ontouchstart' in window || window.matchMedia('(pointer: coarse)').matches)
-    );
-    if (!isTouchDevice) setTappedIdx(null);
-  }, [isTouchDevice]);
-  
-  useEffect(() => {
-    if (!isTouchDevice) return;
-    const handleTouch = () => setTappedIdx(null);
-    window.addEventListener('touchstart', handleTouch);
-    return () => window.removeEventListener('touchstart', handleTouch);
-  }, [isTouchDevice]);
-
-  const getTypeBadge = (type) => {
-    const isAcademic = type === 'Academic';
-    const isCompetition = type === 'Competition';
-    const isAchievement = type === 'Achievement';
-    
-    return (
-      <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-        isAcademic 
-          ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-          : isCompetition
-          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-          : isAchievement
-          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-          : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-      }`}>
-        {isAcademic ? <Star className="w-3 h-3 mr-1" /> : <Trophy className="w-3 h-3 mr-1" />}
-        {type}
-      </div>
-    );
-  };
-
   return (
     <section id="awards" className="py-24 px-4 relative">
       <div className="container mx-auto max-w-6xl">
         {/* Section Header */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-14"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-[1.25] bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-            Awards & Achievements
+            Honors & Awards
           </h2>
         </motion.div>
-        <div className="space-y-8">
-          {awards.map((award, idx) => (
-            <motion.div
-              key={idx}
-              className={`relative flex flex-col lg:flex-row items-start bg-card/40 backdrop-blur-md p-6 lg:p-8 rounded-3xl shadow-xl overflow-hidden group cursor-pointer border border-primary/10 ${tappedIdx === idx ? 'scale-105 shadow-[0_8px_40px_0_rgba(220,38,38,0.25)]' : ''}`}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: idx * 0.1, ease: 'easeOut' }}
-              whileHover={{ scale: 1.03, boxShadow: '0 8px 40px 0 rgba(220, 38, 38, 0.25)', transition: { duration: 0.25, ease: 'easeOut' } }}
-              {...(isTouchDevice ? {
-                onTouchStart: e => { e.stopPropagation(); setTappedIdx(tappedIdx === idx ? null : idx); },
-                onClick: e => { if (tappedIdx !== idx) { e.preventDefault(); setTappedIdx(idx); } else { setTappedIdx(null); } }
-              } : {})}
-            >
-              {/* Enhanced neon border */}
-              <span
-                className={`pointer-events-none absolute inset-0 rounded-3xl border-2 border-primary z-20 opacity-0 transition-all duration-300 ${tappedIdx === idx ? 'opacity-100' : 'group-hover:opacity-100'}`}
-                style={{
-                  boxShadow: '0 0 30px 8px rgba(220,38,38,0.6), 0 0 80px 15px rgba(220,38,38,0.3)',
-                  borderColor: 'rgba(220,38,38,0.9)',
-                }}
-              />
-              
-              {/* Enhanced accent bar */}
-              <span className={`absolute left-0 top-6 bottom-6 w-1.5 rounded-full bg-gradient-to-b from-primary to-primary/60 transition-transform duration-300 ${tappedIdx === idx ? 'scale-y-110' : 'group-hover:scale-y-110'}`} />
-              
-              {/* Award type badge */}
-              <div className="absolute top-6 right-6 z-30">
-                {getTypeBadge(award.type)}
-              </div>
 
-              {/* Year badge */}
-              {award.year && (
-                <div className="absolute top-6 left-6 z-30">
-                  <div className="inline-flex items-center px-2 py-1 rounded-lg bg-primary/20 text-primary text-xs font-medium border border-primary/30">
-                    <Calendar className="w-3 h-3 mr-1" />
-                    {award.year}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {awards.map((award, idx) => {
+            const Icon = award.icon;
+            const wide = idx === awards.length - 1 && awards.length % 2 === 1;
+            return (
+              <motion.article
+                key={award.title}
+                className={`group relative flex gap-5 rounded-2xl border border-primary/10 bg-card/40 backdrop-blur-md p-6 overflow-hidden transition-all duration-300 hover:border-primary/40 text-left ${
+                  wide ? "md:col-span-2" : ""
+                }`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5, delay: (idx % 2) * 0.08, ease: "easeOut" }}
+                whileHover={{ y: -4 }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_0%,rgba(220,38,38,0.14),transparent_70%)]" />
+
+                <div className="relative z-10 flex-shrink-0">
+                  <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 group-hover:drop-shadow-[0_0_14px_rgba(220,38,38,0.6)] transition-all duration-300">
+                    <Icon className="w-6 h-6 text-primary" />
                   </div>
                 </div>
-              )}
 
-              {/* Icon */}
-              <div className="mb-6 lg:mb-0 lg:mr-8 z-10 select-none flex-shrink-0">
-                <div className={`p-4 rounded-2xl bg-primary/10 border border-primary/20 transition-all duration-200 ${tappedIdx === idx ? 'drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]' : 'group-hover:drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]'}`}>
-                  <span className={`transition-all duration-200 ${tappedIdx === idx ? 'drop-shadow-[0_0_20px_rgba(220,38,38,1)]' : 'group-hover:drop-shadow-[0_0_20px_rgba(220,38,38,1)]'}`}>{award.icon}</span>
+                <div className="relative z-10 flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${
+                        typeStyles[award.type] || typeStyles.Achievement
+                      }`}
+                    >
+                      {award.type}
+                    </span>
+                    {award.year && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-primary/10 text-primary border border-primary/20">
+                        <Calendar className="w-2.5 h-2.5" />
+                        {award.year}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-base font-bold text-foreground leading-snug mb-1.5">
+                    {award.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{award.detail}</p>
                 </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 w-full text-center lg:text-left overflow-hidden">
-                <h3 className="text-xl lg:text-2xl font-bold mb-4 text-foreground break-words leading-tight">
-                  {award.title}
-                  {award.extra && <span className="text-primary font-bold">{award.extra}</span>}
-                </h3>
-              </div>
-            </motion.div>
-          ))}
+              </motion.article>
+            );
+          })}
         </div>
       </div>
     </section>
   );
-}; 
+};
