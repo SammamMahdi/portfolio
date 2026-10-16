@@ -387,6 +387,13 @@ html[data-crt="off"] .glow-strong { text-shadow: none; }
   100% { opacity: 1; transform: scale(1); filter: brightness(1); }
 }
 .rise { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+/* brand mark: the cube draws itself in, the lens breathes */
+.brand-mark { color: var(--t-amber); filter: drop-shadow(0 0 4px var(--t-glow)); }
+.brand-draw { stroke-dasharray: 60; stroke-dashoffset: 60; animation: brand-draw 1.1s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards; }
+.brand-lens { animation: lens 2.8s ease-in-out infinite; }
+@keyframes brand-draw { to { stroke-dashoffset: 0; } }
+@keyframes lens { 50% { opacity: 0.4; } }
+html[data-crt="off"] .brand-mark { filter: none; }
 @keyframes fig-ripple {
   from { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
   to { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }

@@ -1,5 +1,6 @@
 import { profile, links, publications, ME_NAME, education } from "@/data/portfolio";
 import { Typed } from "@/components/term/Term";
+import { Scramble, CountUp } from "@/components/term/Scramble";
 import { PortraitViewer } from "@/components/viz/PortraitViewer";
 import { scrollToSection } from "@/hooks/useTerm";
 
@@ -20,18 +21,20 @@ export function Hero() {
       <div className="container grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
         <div className="rise min-w-0">
           <p className="text-sm t-dim">
-            <span className="t-amber">sammam@lab</span>
+            <span className="t-amber">sammam</span>
             <span className="t-faint">:~$ </span>
-            <Typed text="whoami" className="t-text" speed={70} />
+            <Typed text="whoami" className="t-text" speed={110} />
           </p>
 
           <h1 className="mt-5 font-display text-[clamp(3.9rem,11vw,7.6rem)] uppercase leading-[0.82] t-hi glow-strong">
-            Sammam
+            <Scramble text="Sammam" play="load" duration={1700} />
             <br />
-            Mahdi
+            <Scramble text="Mahdi" play="load" duration={2000} />
           </h1>
 
-          <p className="mt-6 text-lg t-amber md:text-xl">{profile.role}</p>
+          <p className="mt-6 min-h-[1.75rem] text-lg t-amber md:text-xl">
+            <Typed text={profile.role} speed={42} cursor />
+          </p>
           <p className="mt-2 flex items-center gap-2 text-sm t-text">
             <span className="relative inline-flex h-2 w-2" aria-hidden="true">
               <span className="absolute inset-0 animate-ping bg-[var(--t-amber)] opacity-60" />
@@ -46,7 +49,9 @@ export function Hero() {
             {VITALS.map((x) => (
               <div key={x.k} className="border-b border-r border-[var(--t-line)] px-3 py-3">
                 <dt className="text-[0.65rem] uppercase tracking-[0.16em] t-dim">{x.k}</dt>
-                <dd className="m-0 font-display text-[2.4rem] t-hi glow">{x.v}</dd>
+                <dd className="m-0 font-display text-[2.4rem] t-hi glow">
+                  <CountUp value={x.v} />
+                </dd>
                 <dd className="m-0 text-[0.68rem] leading-snug t-dim">{x.sub}</dd>
               </div>
             ))}

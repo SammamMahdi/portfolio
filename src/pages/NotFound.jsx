@@ -9,7 +9,7 @@ export default function NotFound({ path }) {
       <div className="w-full max-w-xl text-sm">
         <p className="font-display text-[6rem] leading-none t-hi glow-strong">404</p>
         <p className="mt-4 t-text">
-          <span className="t-amber">sammam@lab</span>
+          <span className="t-amber">sammam</span>
           <span className="t-faint">:~$ </span>cd {where}
         </p>
         <p className="t-alert">bash: cd: {where}: No such file or directory</p>

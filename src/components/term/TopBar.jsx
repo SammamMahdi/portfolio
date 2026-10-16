@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { sections, profile } from "@/data/portfolio";
 import { scrollToSection, useActiveSection } from "@/hooks/useTerm";
 import { THEMES } from "@/lib/themes";
+import { BrandMark } from "./BrandMark";
+import { Scramble } from "./Scramble";
 import { useTerm } from "./termStore";
 
 const fmt = new Intl.DateTimeFormat("en-GB", {
@@ -28,6 +30,49 @@ function DhakaClock() {
 
 const ids = sections.map((s) => s.id);
 
+/** Name + mark. The name decodes on load and again on hover; the cube flips its depth on hover. */
+function Brand({ onClick }) {
+  const [flipped, setFlipped] = useState(false);
+  const [replay, setReplay] = useState(0);
+  const enter = () => {
+    setFlipped(true);
+    setReplay((r) => r + 1);
+  };
+  const leave = () => setFlipped(false);
+  return (
+    <a
+      href="/#whoami"
+      onClick={onClick}
+      onMouseEnter={enter}
+      onMouseLeave={leave}
+      onFocus={enter}
+      onBlur={leave}
+      className="flex shrink-0 items-center gap-2 whitespace-nowrap text-sm font-semibold no-underline"
+    >
+      <BrandMark flipped={flipped} />
+      <Scramble text={profile.name} play="load" replay={replay} hover={false} className="t-hi tracking-wide" />
+    </a>
+  );
+}
+
+function NavItem({ s, on, onClick }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <a
+      href={`#${s.id}`}
+      onClick={onClick}
+      onMouseEnter={() => setHover((h) => h + 1)}
+      aria-current={on ? "true" : undefined}
+      className={`whitespace-nowrap px-2.5 py-1 text-[0.8rem] leading-none no-underline transition-colors ${
+        on ? "bg-[var(--t-amber)] text-[var(--t-bg)]" : "t-dim hover:text-[var(--t-hi)]"
+      }`}
+    >
+      <span className={on ? "opacity-60" : "t-faint"}>./</span>
+      <Scramble text={s.label} play="load" replay={hover} hover={false} duration={700} />
+    </a>
+  );
+}
+
 export function TopBar() {
   const { crt, setCrt, toggleShell, theme, cycleTheme } = useTerm();
   const active = useActiveSection(ids);
@@ -46,30 +91,12 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--t-line)] bg-[var(--t-veil)] backdrop-blur-sm md:top-[10px]">
       <div className="container flex h-12 items-center gap-6">
-        <a href="/#whoami" onClick={go("whoami")} className="flex shrink-0 items-center gap-2 whitespace-nowrap text-sm no-underline">
-          <span className="inline-block h-3.5 w-2 bg-[var(--t-amber)] shadow-[0_0_8px_var(--t-glow)]" aria-hidden="true" />
-          <span className="t-hi">{profile.handle}</span>
-          <span className="t-faint">@lab</span>
-        </a>
+        <Brand onClick={go("whoami")} />
 
-        <nav aria-label="Sections" className="hidden items-center gap-1 xl:flex">
-          {sections.map((s) => {
-            const on = home && active === s.id;
-            return (
-              <a
-                key={s.id}
-                href={`#${s.id}`}
-                onClick={go(s.id)}
-                aria-current={on ? "true" : undefined}
-                className={`flex items-baseline gap-1 whitespace-nowrap px-2.5 py-1 text-[0.8rem] leading-none no-underline transition-colors ${
-                  on ? "bg-[var(--t-amber)] text-[var(--t-bg)]" : "t-dim hover:text-[var(--t-hi)]"
-                }`}
-              >
-                <span className={`text-[0.62rem] ${on ? "opacity-70" : "t-faint"}`}>{s.key}</span>
-                {s.label}
-              </a>
-            );
-          })}
+        <nav aria-label="Sections" className="hidden items-center gap-0.5 xl:flex">
+          {sections.map((s) => (
+            <NavItem key={s.id} s={s} on={home && active === s.id} onClick={go(s.id)} />
+          ))}
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -123,7 +150,8 @@ export function TopBar() {
                   onClick={go(s.id)}
                   className={`block py-2 text-sm no-underline ${active === s.id ? "t-amber" : "t-text"}`}
                 >
-                  <span className="t-faint">{s.key}</span> {s.label}
+                  <span className="t-faint">./</span>
+                  {s.label}
                 </a>
               </li>
             ))}

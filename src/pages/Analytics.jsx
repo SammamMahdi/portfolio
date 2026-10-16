@@ -280,7 +280,7 @@ export default function Analytics() {
         <form onSubmit={submit} className="w-full max-w-md text-sm">
           <p className="font-display text-5xl t-hi glow-strong">ANALYTICS</p>
           <p className="mt-4 t-text">
-            <span className="t-amber">sammam@lab</span>
+            <span className="t-amber">sammam</span>
             <span className="t-faint">:~$ </span>sudo analytics
           </p>
           <label className="mt-1 flex items-center gap-2 t-text">
@@ -314,7 +314,7 @@ export default function Analytics() {
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm t-dim">
-            <span className="t-amber">sammam@lab</span>
+            <span className="t-amber">sammam</span>
             <span className="t-faint">:~# </span>analytics --live
           </p>
           <h1 className="mt-2 font-display text-[3.4rem] uppercase leading-none t-hi glow-strong md:text-[4.4rem]">Visitors</h1>

@@ -149,7 +149,7 @@ export const WorkDetail = () => {
           </Sec>
 
           <div className="mt-12 flex justify-between border-t border-[var(--t-line)] pt-2 text-[0.75rem] t-dim">
-            <span>sammam@lab</span>
+            <span>sammam</span>
             <span>{item.year || "2026"}</span>
             <span>
               {NAME}({section})

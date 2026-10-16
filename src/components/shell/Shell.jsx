@@ -5,7 +5,7 @@ import { isTyping, scrollToSection } from "@/hooks/useTerm";
 import { run, complete } from "./commands";
 
 const GREETING = [
-  ["sammam@lab shell — type `help` to see what it can do.", "t-dim"],
+  ["sammam shell — type `help` to see what it can do.", "t-dim"],
 ];
 
 /** Drop-down console, toggled with the backtick key or the top-bar button. */
@@ -134,7 +134,7 @@ export function Shell() {
             </div>
             <form onSubmit={submit} className="mt-1 flex items-center gap-2">
               <label htmlFor="shell-input" className="shrink-0">
-                <span className="t-amber">sammam@lab</span>
+                <span className="t-amber">sammam</span>
                 <span className="t-faint">:~$</span>
               </label>
               <input

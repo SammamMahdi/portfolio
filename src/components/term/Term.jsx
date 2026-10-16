@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { sections } from "@/data/portfolio";
+import { Scramble } from "./Scramble";
 import { useInView, useReducedMotion } from "@/hooks/useTerm";
 
 /** A framed terminal window with a title bar. */
@@ -17,7 +18,7 @@ export function Window({ title, right, children, className, bodyClassName, ...re
 }
 
 /** Types `text` once when scrolled into view. */
-export function Typed({ text, speed = 28, className, cursor = false, onDone }) {
+export function Typed({ text, speed = 45, className, cursor = false, onDone }) {
   const reduced = useReducedMotion();
   const [ref, inView] = useInView();
   const [n, setN] = useState(0);
@@ -59,9 +60,11 @@ export function SectionHead({ id, title, cmd, children }) {
           press <span className="kbd">{s?.key}</span>
         </span>
       </div>
-      <h2 className="font-display text-[3.4rem] uppercase t-hi glow-strong md:text-[4.6rem]">{title}</h2>
+      <h2 className="font-display text-[3.4rem] uppercase t-hi glow-strong md:text-[4.6rem]">
+        <Scramble text={title} play="view" duration={1500} />
+      </h2>
       <p className="mt-3 text-sm t-dim">
-        <span className="t-amber">sammam@lab</span>
+        <span className="t-amber">sammam</span>
         <span className="t-faint">:</span>
         <span className="t-dim">~</span>
         <span className="t-faint">$ </span>
