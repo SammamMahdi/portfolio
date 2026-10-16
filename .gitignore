@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Private working files — keep out of the public repo
+CV-*.tex
+CV-MASTER.md
+Sammam_Mahdi_CV.pdf
+sammam_new.png
+inspoimages/
+# template README + banner (deleted from the repo earlier)
+README.md
+banner.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

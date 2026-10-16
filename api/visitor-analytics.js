@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+import { authorized } from "./_auth.js";
 
 const uri = process.env.MONGODB_URI;
 const dbName = "portfolio";
@@ -15,6 +16,7 @@ async function connectToDatabase() {
 }
 
 export default async function handler(req, res) {
+  if (!authorized(req, res)) return;
   try {
     const client = await connectToDatabase();
     const db = client.db(dbName);

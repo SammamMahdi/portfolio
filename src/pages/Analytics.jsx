@@ -1,517 +1,526 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
-import { useNavigate } from "react-router-dom";
-import { StarBackground } from "../components/StarBackground";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { useStage } from "@/three/useStage";
+import { useReducedMotion } from "@/hooks/useTerm";
+import { Window } from "@/components/term/Term";
+import { mulberry32 } from "@/lib/rand";
 
-const chartContainerStyle = {
-  maxWidth: "100%",
-  minHeight: 400,
-  margin: "2rem auto",
-  position: "relative",
-  zIndex: 1,
-};
+/* ── helpers ─────────────────────────────────────────────────────────── */
+const DAY = 864e5;
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const pad = (n) => String(n).padStart(2, "0");
+const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-const glassStyle = {
-  background: "rgba(24, 26, 32, 0.18)",
-  borderRadius: "1rem",
-  border: "1.5px solid rgba(255,255,255,0.04)",
-  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-  backdropFilter: "blur(16px)",
-  WebkitBackdropFilter: "blur(16px)",
-  padding: "1.5rem",
-  overflow: "hidden",
-};
-
-const neonLineStyle = {
-  filter: "drop-shadow(0 0 6px #ff1744) drop-shadow(0 0 12px #ff1744)"
-};
-
-const VIEWS = ["Daily", "Weekly", "Monthly", "Yearly"];
-
-function getWeekNumber(date) {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-  const yearStart = new Date(d.getFullYear(), 0, 1);
-  const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-  return weekNo;
-}
-
-function pad(n) { return n < 10 ? `0${n}` : n; }
-
-// Helper to get cookie
 function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  const parts = `; ${document.cookie}`.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
-export default function Analytics() {
-  const [rawData, setRawData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [view, setView] = useState("Yearly");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-  const [selectedDay, setSelectedDay] = useState(new Date().getDate());
-  const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
-  const [filterStartDate, setFilterStartDate] = useState("");
-  const [filterEndDate, setFilterEndDate] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState("");
-  const navigate = useNavigate();
+function readPin() {
+  try {
+    return sessionStorage.getItem("analytics_pin") || "";
+  } catch {
+    return "";
+  }
+}
 
-  // Authentication logic
+function ago(d) {
+  const s = (Date.now() - d.getTime()) / 1000;
+  if (s < 90) return "just now";
+  if (s < 5400) return `${Math.round(s / 60)} min ago`;
+  if (s < 129600) return `${Math.round(s / 3600)} h ago`;
+  return `${Math.round(s / 86400)} d ago`;
+}
+
+/** Bars as SVG: values with optional labels, a max line and hover titles. */
+function Bars({ values, labels, titles, height = 110, hi = -1 }) {
+  const max = Math.max(1, ...values);
+  const W = 100 / values.length;
+  return (
+    <svg viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" className="block w-full" style={{ height }} role="img">
+      {values.map((v, i) => {
+        const h = (v / max) * (height - 14);
+        return (
+          <rect
+            key={i}
+            x={i * W + W * 0.12}
+            y={height - 12 - h}
+            width={W * 0.76}
+            height={Math.max(v ? 1 : 0.4, h)}
+            fill={i === hi ? "var(--t-hi)" : v ? "var(--t-amber)" : "var(--t-line)"}
+            opacity={v ? 0.9 : 1}
+          >
+            <title>{titles ? titles[i] : `${labels?.[i] ?? i}: ${v}`}</title>
+          </rect>
+        );
+      })}
+      <line x1="0" x2="100" y1={height - 11.5} y2={height - 11.5} stroke="var(--t-line)" strokeWidth="0.5" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+/** Local-development preview only: ~6 months of plausible visits, clearly labelled as sample data. */
+function sampleVisits() {
+  const rng = mulberry32(42);
+  const out = [];
+  for (let i = 0; i < 420; i++) {
+    const at = new Date(Date.now() - Math.floor(Math.pow(rng(), 1.7) * 180) * DAY);
+    at.setHours(Math.floor(8 + rng() * 15) % 24, Math.floor(rng() * 60));
+    if (at > new Date()) continue;
+    out.push({ _id: `demo-${i}`, visitorId: `demo-${Math.floor(rng() * 1e9).toString(16)}`, at });
+  }
+  return out.sort((a, b) => b.at - a.at);
+}
+
+function Kpi({ k, v, sub }) {
+  return (
+    <div className="border-b border-r border-[var(--t-line)] px-4 py-3">
+      <div className="text-[0.65rem] uppercase tracking-[0.16em] t-dim">{k}</div>
+      <div className="font-display text-[2.6rem] leading-none t-hi glow">{v}</div>
+      {sub && <div className="mt-1 text-[0.68rem] t-dim">{sub}</div>}
+    </div>
+  );
+}
+
+/* ── 3D skyline ──────────────────────────────────────────────────────── */
+function Skyline({ days }) {
+  const reduced = useReducedMotion();
+  const [hover, setHover] = useState(null);
+  const { wrapRef, canvasRef, stageRef, status } = useStage((canvas) =>
+    import("@/three/SkylineScene").then(({ SkylineScene }) => new SkylineScene(canvas, { reducedMotion: reduced, onHover: setHover }))
+  );
   useEffect(() => {
-    const authStatus = sessionStorage.getItem('analytics_authenticated');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
+    stageRef.current?.setData(days);
+  }, [days, status, stageRef]);
+  return (
+    <div ref={wrapRef} className="relative h-[320px] bg-[var(--t-deep)] sm:h-[380px]">
+      <canvas
+        ref={canvasRef}
+        tabIndex={0}
+        aria-label="3D skyline of visits per day over the last 26 weeks. Drag to orbit."
+        className="absolute inset-0 h-full w-full cursor-grab touch-pan-y outline-none active:cursor-grabbing"
+      />
+      <div className="pointer-events-none absolute left-3 top-2 text-[0.65rem] uppercase tracking-[0.16em] t-dim">
+        26 weeks · one bar per day · drag to orbit
+      </div>
+      <div className="pointer-events-none absolute bottom-2 left-3 text-[0.75rem]">
+        {hover ? (
+          <span className="t-hi">
+            {WEEKDAYS[hover.weekday]} {hover.date} · {hover.count} visit{hover.count === 1 ? "" : "s"}
+          </span>
+        ) : (
+          <span className="t-faint">hover a bar</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── page ────────────────────────────────────────────────────────────── */
+export default function Analytics() {
+  const [pin, setPin] = useState(readPin);
+  const [input, setInput] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [tries, setTries] = useState(0);
+  const [rows, setRows] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [range, setRange] = useState(30);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [limit, setLimit] = useState(50);
+  const [confirm, setConfirm] = useState("");
+  const [showDanger, setShowDanger] = useState(false);
+  const [offline, setOffline] = useState(false);
+  const [demo, setDemo] = useState(false);
+
+  const api = useCallback(
+    (path, opts = {}) => fetch(path, { ...opts, headers: { ...(opts.headers || {}), "x-analytics-pin": pin } }),
+    [pin]
+  );
+
+  const logout = useCallback((msg = "") => {
+    try {
+      sessionStorage.removeItem("analytics_pin");
+    } catch {
+      /* ignore */
     }
+    setPin("");
+    setRows(null);
+    setAuthError(msg);
   }, []);
 
-  // Data fetching and auto-delete logic
-  useEffect(() => {
-    if (!isAuthenticated) return;
+  // load (and, as before, drop the admin's own most recent visit so it doesn't count)
+  const load = useCallback(async () => {
+    if (!pin || demo) return;
     setLoading(true);
-    fetch("/api/visitor-analytics")
-      .then((res) => res.json())
-      .then(async (res) => {
-        const visits = res.visits.map(v => ({ ...v, lastVisit: new Date(v.lastVisit || v.timestamp) }));
-        setRawData(visits);
-        setLoading(false);
-        // After authentication, auto-delete this user's most recent record if it exists
-        const visitorId = getCookie('unique_visitor_id');
-        if (visitorId) {
-          const myRecords = visits.filter(v => v.visitorId === visitorId);
-          if (myRecords.length > 0) {
-            myRecords.sort((a, b) => b.lastVisit - a.lastVisit);
-            const myLatest = myRecords[0];
-            try {
-              await fetch("/api/delete-visitor", {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ _id: myLatest._id })
-              });
-              setRawData(prev => prev.filter(v => v._id !== myLatest._id));
-            } catch (err) {
-              // Ignore error
-            }
-          }
-        }
-      })
-      .catch((error) => {
-        console.error("Analytics error:", error);
-        setLoading(false);
-      });
-  }, [isAuthenticated]);
+    setOffline(false);
+    try {
+      const res = await api("/api/visitor-analytics");
+      // Under `vite` (local dev) /api isn't executed: the dev server returns the function's source instead of JSON.
+      if (!(res.headers.get("content-type") || "").includes("application/json")) {
+        setOffline(true);
+        setRows(null);
+        return;
+      }
+      if (res.status === 401) return logout("Sorry, try again.");
+      if (res.status === 503) return logout("server: ANALYTICS_PIN is not set — add it to the deployment's environment variables.");
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      let visits = data.visits
+        .map((v) => ({ ...v, at: new Date(v.lastVisit || v.timestamp) }))
+        .filter((v) => !isNaN(v.at.getTime()));
+      const me = getCookie("unique_visitor_id");
+      const mine = visits.filter((v) => v.visitorId === me).sort((a, b) => b.at - a.at)[0];
+      if (mine) {
+        const del = await api("/api/delete-visitor", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ _id: mine._id }),
+        });
+        if (del.ok) visits = visits.filter((v) => v._id !== mine._id);
+      }
+      setRows(visits.sort((a, b) => b.at - a.at));
+    } catch {
+      setOffline(true);
+      setRows(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [api, pin, logout, demo]);
 
-  // PIN modal submit handler
-  const handlePinSubmit = (e) => {
+  const previewDemo = () => {
+    setDemo(true);
+    setOffline(false);
+    setRows(sampleVisits());
+  };
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const submit = (e) => {
     e.preventDefault();
-    if (pinInput === "621311518") {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('analytics_authenticated', 'true');
-      setPinError("");
-    } else {
-      setPinError("Incorrect PIN. Please try again.");
-    }
-  };
-
-  // Get available years, months, weeks, days from data
-  const years = Array.from(new Set(rawData.map(v => v.lastVisit.getFullYear()))).sort((a, b) => b - a);
-  const months = Array.from(new Set(rawData.filter(v => v.lastVisit.getFullYear() === selectedYear).map(v => v.lastVisit.getMonth() + 1))).sort((a, b) => a - b);
-  const days = Array.from(new Set(rawData.filter(v => v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth).map(v => v.lastVisit.getDate()))).sort((a, b) => a - b);
-  const weeks = Array.from(new Set(rawData.filter(v => v.lastVisit.getFullYear() === selectedYear).map(v => getWeekNumber(v.lastVisit)))).sort((a, b) => a - b);
-
-  // Group data for chart
-  let chartData = [];
-  if (view === "Yearly") {
-    const grouped = {};
-    for (let m = 1; m <= 12; m++) grouped[m] = 0;
-    rawData.filter(v => {
-      // Check if lastVisit is a valid date
-      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
-        return false;
-      }
-      return v.lastVisit.getFullYear() === selectedYear;
-    }).forEach(v => {
-      const month = v.lastVisit.getMonth() + 1;
-      grouped[month]++;
-    });
-    chartData = Object.entries(grouped).map(([month, count]) => ({
-      label: `${pad(month)}/${selectedYear}`,
-      count
-    }));
-  } else if (view === "Monthly") {
-    const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
-    const grouped = {};
-    for (let d = 1; d <= daysInMonth; d++) grouped[d] = 0;
-    rawData.filter(v => {
-      // Check if lastVisit is a valid date
-      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
-        return false;
-      }
-      return v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth;
-    }).forEach(v => {
-      const day = v.lastVisit.getDate();
-      grouped[day]++;
-    });
-    chartData = Object.entries(grouped).map(([day, count]) => ({
-      label: `${pad(day)}/${pad(selectedMonth)}/${selectedYear}`,
-      count
-    }));
-  } else if (view === "Weekly") {
-    const grouped = {};
-    for (let d = 0; d < 7; d++) grouped[d] = 0;
-    rawData.filter(v => {
-      // Check if lastVisit is a valid date
-      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
-        return false;
-      }
-      return v.lastVisit.getFullYear() === selectedYear && getWeekNumber(v.lastVisit) === selectedWeek;
-    }).forEach(v => {
-      const day = v.lastVisit.getDay();
-      grouped[day]++;
-    });
-    chartData = Object.entries(grouped).map(([day, count]) => ({
-      label: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][day],
-      count
-    }));
-  } else if (view === "Daily") {
-    const grouped = {};
-    for (let h = 0; h < 24; h++) grouped[h] = 0;
-    rawData.filter(v => {
-      // Check if lastVisit is a valid date
-      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
-        return false;
-      }
-      return v.lastVisit.getFullYear() === selectedYear && v.lastVisit.getMonth() + 1 === selectedMonth && v.lastVisit.getDate() === selectedDay;
-    }).forEach(v => {
-      const hour = v.lastVisit.getHours();
-      grouped[hour]++;
-    });
-    chartData = Object.entries(grouped).map(([hour, count]) => {
-      const h = Number(hour);
-      const ampm = h < 12 ? "AM" : "PM";
-      const hour12 = h % 12 === 0 ? 12 : h % 12;
-      return {
-        label: `${pad(hour12)}:00 ${ampm}`,
-        count
-      };
-    });
-  }
-
-  // Filtered visits for the table
-  const filteredVisits = useMemo(() => {
-    return rawData.filter(v => {
-      // Check if lastVisit is a valid date
-      if (!v.lastVisit || isNaN(v.lastVisit.getTime())) {
-        return false;
-      }
-      
-      const dateStr = v.lastVisit.toISOString().split("T")[0];
-      if (filterStartDate && dateStr < filterStartDate) return false;
-      if (filterEndDate && dateStr > filterEndDate) return false;
-      return true;
-    }).sort((a, b) => b.lastVisit - a.lastVisit); // newest first
-  }, [rawData, filterStartDate, filterEndDate]);
-
-  const handleDeleteRecords = async () => {
-    const confirmDelete = window.confirm("Are you sure you want to delete ALL visitor records? This action cannot be undone.");
-    if (!confirmDelete) return;
-
+    if (!input) return;
     try {
-      const response = await fetch("/api/delete-visitors", {
-        method: "DELETE",
-      });
-      
-      if (response.ok) {
-        alert("All visitor records have been deleted successfully.");
-        // Refresh the data
-        window.location.reload();
-      } else {
-        alert("Failed to delete records. Please try again.");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      alert("Error deleting records. Please try again.");
+      sessionStorage.setItem("analytics_pin", input);
+    } catch {
+      /* ignore */
+    }
+    setTries((t) => t + 1);
+    setAuthError("");
+    setPin(input);
+    setInput("");
+  };
+
+  const removeOne = async (_id) => {
+    if (demo) return setRows((r) => r.filter((v) => v._id !== _id)); // sample data: local only
+    const res = await api("/api/delete-visitor", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ _id }),
+    });
+    if (res.ok) setRows((r) => r.filter((v) => v._id !== _id));
+  };
+
+  const removeAll = async () => {
+    const res = demo ? { ok: true } : await api("/api/delete-visitors", { method: "DELETE" });
+    if (res.ok) {
+      setRows([]);
+      setShowDanger(false);
+      setConfirm("");
     }
   };
 
-  const handleDeleteRecord = async (_id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this record?");
-    if (!confirmDelete) return;
-    try {
-      const response = await fetch("/api/delete-visitor", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ _id })
-      });
-      if (response.ok) {
-        setRawData(prev => prev.filter(v => v._id !== _id));
-      } else {
-        alert("Failed to delete record.");
-      }
-    } catch (error) {
-      alert("Error deleting record.");
+  /* ── derived ── */
+  const stats = useMemo(() => {
+    if (!rows) return null;
+    const today = startOfDay(new Date());
+    const byDay = new Map();
+    const hours = new Array(24).fill(0), weekdays = new Array(7).fill(0);
+    rows.forEach((v) => {
+      const k = ymd(v.at);
+      byDay.set(k, (byDay.get(k) || 0) + 1);
+      hours[v.at.getHours()]++;
+      weekdays[v.at.getDay()]++;
+    });
+    const within = (n) => rows.filter((v) => v.at >= new Date(today.getTime() - (n - 1) * DAY)).length;
+    // skyline: 26 full weeks ending this week
+    const start = new Date(today.getTime() - (today.getDay() + 25 * 7) * DAY);
+    const sky = [];
+    for (let d = new Date(start); d <= today; d = new Date(d.getTime() + DAY)) {
+      const i = Math.round((d - start) / DAY);
+      sky.push({ date: ymd(d), count: byDay.get(ymd(d)) || 0, week: Math.floor(i / 7), weekday: d.getDay() });
     }
-  };
+    const peak = hours.indexOf(Math.max(...hours));
+    return { byDay, hours, weekdays, sky, today: within(1), week: within(7), month: within(30), peak };
+  }, [rows]);
 
-  // PIN Modal
-  if (!isAuthenticated) {
+  const timeline = useMemo(() => {
+    if (!stats || !rows) return null;
+    const today = startOfDay(new Date());
+    const span = range === 0 ? Math.max(1, Math.ceil((today - startOfDay(rows[rows.length - 1]?.at || today)) / DAY) + 1) : range;
+    const days = [];
+    for (let i = span - 1; i >= 0; i--) {
+      const d = new Date(today.getTime() - i * DAY);
+      days.push([ymd(d), stats.byDay.get(ymd(d)) || 0]);
+    }
+    return days;
+  }, [stats, rows, range]);
+
+  const filtered = useMemo(
+    () => (rows || []).filter((v) => (!from || ymd(v.at) >= from) && (!to || ymd(v.at) <= to)),
+    [rows, from, to]
+  );
+
+  /* ── views ── */
+  if (!pin) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-        <form onSubmit={handlePinSubmit} className="bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col items-center border border-red-600 min-w-[280px]">
-          <h2 className="text-xl font-bold mb-4 text-white">Enter Analytics PIN</h2>
-          <input
-            type="password"
-            value={pinInput}
-            onChange={e => setPinInput(e.target.value)}
-            className="px-4 py-2 rounded border border-gray-700 bg-gray-800 text-white mb-2 w-full text-center"
-            placeholder="PIN"
-            autoFocus
-          />
-          {pinError && <div className="text-red-500 mb-2 text-sm">{pinError}</div>}
-          <button
-            type="submit"
-            className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-md font-semibold transition-colors cursor-pointer border-2 border-red-600 w-full mt-2"
-          >
-            Submit
-          </button>
+      <main className="flex min-h-screen items-center justify-center px-5">
+        <form onSubmit={submit} className="w-full max-w-md text-sm">
+          <p className="font-display text-5xl t-hi glow-strong">ANALYTICS</p>
+          <p className="mt-4 t-text">
+            <span className="t-amber">sammam@lab</span>
+            <span className="t-faint">:~$ </span>sudo analytics
+          </p>
+          <label className="mt-1 flex items-center gap-2 t-text">
+            [sudo] password for sammam:
+            <input
+              type="password"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              autoFocus
+              aria-label="Analytics PIN"
+              className="min-w-0 flex-1 border-0 border-b border-[var(--t-faint)] bg-transparent px-1 text-[var(--t-hi)] outline-none focus:border-[var(--t-amber)]"
+            />
+          </label>
+          {authError && <p className="mt-2 t-alert">{authError}</p>}
+          {tries >= 3 && authError.startsWith("Sorry") && <p className="t-dim">sudo: {tries} incorrect password attempts</p>}
+          <div className="mt-6 flex gap-3">
+            <button type="submit" className="btn-term is-primary">
+              authenticate ⏎
+            </button>
+            <Link to="/" className="btn-term">
+              cd ~
+            </Link>
+          </div>
         </form>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen w-full relative flex flex-col items-center justify-center bg-transparent">
-      <StarBackground />
-      <div className="container mx-auto px-4 py-4 relative z-10">
-        {/* Header */}
-        <div className="flex flex-col items-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">
-            Visitor Analytics
-          </h1>
+    <main className="container py-8 md:py-12">
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm t-dim">
+            <span className="t-amber">sammam@lab</span>
+            <span className="t-faint">:~# </span>analytics --live
+          </p>
+          <h1 className="mt-2 font-display text-[3.4rem] uppercase leading-none t-hi glow-strong md:text-[4.4rem]">Visitors</h1>
         </div>
-
-        {/* Delete Records Button */}
-        {isAuthenticated && (
-          <div className="flex justify-center mb-6">
-            <button
-              onClick={handleDeleteRecords}
-              className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-md font-semibold transition-colors cursor-pointer border-2 border-red-600"
-            >
-              🗑️ Delete All Records
-            </button>
-          </div>
-        )}
-
-        {/* View Buttons + Back Button */}
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
-          <button
-            onClick={() => navigate("/")}
-            className="px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors bg-gray-800 text-red-600 border-2 border-gray-800 order-first hover:bg-red-600 hover:text-white hover:border-red-600 cursor-pointer"
-            style={{ minWidth: 80 }}
-          >
-            ← Back
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn-term is-sm" onClick={load} disabled={loading}>
+            {loading ? "loading…" : "↻ refresh"}
           </button>
-          {VIEWS.map(v => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              className={`px-3 py-2 rounded-md font-semibold text-sm md:text-base transition-colors cursor-pointer ${
-                view === v 
-                  ? "bg-red-600 text-white border-2 border-red-600 shadow-lg" 
-                  : "bg-gray-800 text-red-600 border-2 border-gray-800 hover:bg-red-600 hover:text-white hover:border-red-600"
-              }`}
-            >
-              {v}
+          <button type="button" className="btn-term is-sm" onClick={() => logout()}>
+            logout
+          </button>
+          <Link to="/" className="btn-term is-sm is-primary">
+            cd ~
+          </Link>
+        </div>
+      </header>
+
+      {authError && <p className="mb-6 text-sm t-alert">{authError}</p>}
+      {demo && (
+        <p className="mb-6 border border-dashed border-[var(--t-alert)] px-3 py-2 text-sm t-alert">
+          DEMO — sample visits generated in your browser for local development. None of this is real, and deletes only
+          change this preview.
+        </p>
+      )}
+
+      {offline ? (
+        <Window title="api offline" bodyClassName="p-5 text-sm leading-relaxed">
+          <p className="m-0 t-text">The analytics API isn’t running here.</p>
+          <p className="mt-2 t-dim">
+            The <span className="t-hi">/api</span> functions are Vercel serverless functions. They run on the deployed site
+            (or locally with <span className="t-hi">vercel dev</span>, with <span className="t-hi">MONGODB_URI</span> and{" "}
+            <span className="t-hi">ANALYTICS_PIN</span> set). The plain <span className="t-hi">vite</span> dev server only
+            serves their source files, so there is no data to show.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button type="button" className="btn-term is-sm" onClick={load}>
+              ↻ retry
             </button>
-          ))}
-        </div>
-
-        {/* Date Selection */}
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
-          <select 
-            value={selectedYear} 
-            onChange={e => setSelectedYear(Number(e.target.value))} 
-            className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
-          >
-            {years.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
-          
-          {(view === "Monthly" || view === "Daily") && (
-            <select 
-              value={selectedMonth} 
-              onChange={e => setSelectedMonth(Number(e.target.value))} 
-              className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
-            >
-              {months.map(m => <option key={m} value={m}>{pad(m)}</option>)}
-            </select>
-          )}
-          
-          {view === "Daily" && (
-            <select 
-              value={selectedDay} 
-              onChange={e => setSelectedDay(Number(e.target.value))} 
-              className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
-            >
-              {days.map(d => <option key={d} value={d}>{pad(d)}</option>)}
-            </select>
-          )}
-          
-          {view === "Weekly" && (
-            <select 
-              value={selectedWeek} 
-              onChange={e => setSelectedWeek(Number(e.target.value))} 
-              className="px-3 py-2 rounded-md bg-gray-800 text-white border border-red-600 text-sm md:text-base"
-            >
-              {weeks.map(w => <option key={w} value={w}>Week {w}</option>)}
-            </select>
-          )}
-        </div>
-
-        {/* Date Display */}
-        {view === "Daily" && (
-          <div className="text-center text-red-600 mb-4 font-medium text-lg">
-            {`Visits for ${pad(selectedDay)}/${pad(selectedMonth)}/${selectedYear}`}
-          </div>
-        )}
-
-        {/* Chart Container */}
-        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-lg overflow-hidden" style={{ ...chartContainerStyle, ...glassStyle }}>
-          <div className="w-full h-full">
-            {loading ? (
-              <div className="flex items-center justify-center h-64 text-red-600 text-lg">
-                Loading chart...
-              </div>
-            ) : chartData.every(d => d.count === 0) ? (
-              <div className="flex items-center justify-center h-64 text-red-600 text-lg">
-                No visits for this {view.toLowerCase()}.
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={chartData} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
-                  <CartesianGrid stroke="#ff1744" strokeOpacity={0.25} strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="label"
-                    stroke="#fff"
-                    tick={{ fill: "#fff", fontSize: 12 }}
-                    interval={0}
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
-                  />
-                  <YAxis
-                    stroke="#fff"
-                    tick={{ fill: "#fff", fontSize: 14 }}
-                    allowDecimals={false}
-                    label={{ value: 'Unique Visitors', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 16 }}
-                  />
-                  <Tooltip
-                    contentStyle={{ background: "#222", border: "1px solid #ff1744", color: "#fff" }}
-                    labelStyle={{ color: "#ff1744" }}
-                    formatter={(value) => [value, 'Unique Visitors']}
-                    labelFormatter={(label) => view === "Daily" ? `Hour: ${label}` : label}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="count" 
-                    stroke="#ff1744" 
-                    strokeWidth={3} 
-                    dot={{ r: 4, fill: "#ff1744", stroke: "#fff", strokeWidth: 2 }} 
-                    activeDot={{ r: 6 }} 
-                    style={neonLineStyle} 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            {import.meta.env.DEV && (
+              <button type="button" className="btn-term is-sm is-primary" onClick={previewDemo}>
+                preview with sample data
+              </button>
             )}
           </div>
-        </div>
+        </Window>
+      ) : !stats ? (
+        <p className="text-sm t-dim">
+          loading<span className="cursor" aria-hidden="true" />
+        </p>
+      ) : (
+        <>
+          <section className="mb-6 grid grid-cols-2 border-l border-t border-[var(--t-line)] sm:grid-cols-3 lg:grid-cols-6">
+            <Kpi k="all time" v={rows.length} sub="visitor records" />
+            <Kpi k="today" v={stats.today} />
+            <Kpi k="7 days" v={stats.week} />
+            <Kpi k="30 days" v={stats.month} />
+            <Kpi k="peak hour" v={rows.length ? `${pad(stats.peak)}h` : "—"} sub="local time" />
+            <Kpi k="last visit" v={rows[0] ? ago(rows[0].at) : "—"} />
+          </section>
 
-        {/* Visit Details Filters */}
-        <div className="w-full flex flex-wrap gap-2 justify-center items-center mt-8 mb-2">
-          <label className="text-sm text-white">Start Date:
-            <input
-              type="date"
-              value={filterStartDate}
-              onChange={e => setFilterStartDate(e.target.value)}
-              className="ml-2 px-2 py-1 rounded bg-gray-800 text-white border border-gray-700"
-              max={filterEndDate || undefined}
-            />
-          </label>
-          <label className="text-sm text-white">End Date:
-            <input
-              type="date"
-              value={filterEndDate}
-              onChange={e => setFilterEndDate(e.target.value)}
-              className="ml-2 px-2 py-1 rounded bg-gray-800 text-white border border-gray-700"
-              min={filterStartDate || undefined}
-            />
-          </label>
-          {(filterStartDate || filterEndDate) && (
-            <button
-              className="ml-2 px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer text-sm"
-              onClick={() => { setFilterStartDate(""); setFilterEndDate(""); }}
-            >
-              Clear
-            </button>
-          )}
-        </div>
+          <div className="mb-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+            <Window title="skyline.3d">
+              <Skyline days={stats.sky} />
+            </Window>
+            <div className="grid content-start gap-6">
+              <Window title="hour-of-day" bodyClassName="p-4">
+                <Bars values={stats.hours} labels={stats.hours.map((_, i) => `${pad(i)}:00`)} hi={stats.peak} />
+                <div className="mt-1 flex justify-between text-[0.65rem] t-faint">
+                  <span>00</span>
+                  <span>06</span>
+                  <span>12</span>
+                  <span>18</span>
+                  <span>23</span>
+                </div>
+              </Window>
+              <Window title="weekday" bodyClassName="p-4">
+                <Bars values={stats.weekdays} labels={WEEKDAYS} height={90} />
+                <div className="mt-1 grid grid-cols-7 text-center text-[0.65rem] t-faint">
+                  {WEEKDAYS.map((d) => (
+                    <span key={d}>{d}</span>
+                  ))}
+                </div>
+              </Window>
+            </div>
+          </div>
 
-        {/* Visit Details Table */}
-        <div className="w-full overflow-x-auto mt-2 mb-8" style={{ ...glassStyle, border: '1.5px solid rgba(255,255,255,0.04)', boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}>
-          <table className="min-w-full text-sm text-left text-white rounded-xl overflow-hidden">
-            <thead>
-              <tr className="bg-gray-800/80">
-                <th className="px-3 py-2 font-semibold text-white">Date</th>
-                <th className="px-3 py-2 font-semibold text-white">Time</th>
-                <th className="px-3 py-2 font-semibold text-white">Visitor ID</th>
-                {isAuthenticated && <th className="px-3 py-2 font-semibold text-white text-center">Delete</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredVisits.length === 0 ? (
-                <tr>
-                  <td colSpan={isAuthenticated ? 4 : 3} className="px-3 py-4 text-center text-red-500 bg-transparent">No visits in this range.</td>
-                </tr>
-              ) : (
-                filteredVisits.map((v, i) => {
-                  const date = v.lastVisit.toLocaleDateString();
-                  const time = v.lastVisit.toLocaleTimeString();
-                  return (
-                    <tr
-                      key={v.visitorId + v.lastVisit.toISOString() + i}
-                      className={
-                        `transition-colors duration-150 ${i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-800/60"} hover:bg-red-600/30 hover:text-white`
-                      }
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <td className="px-3 py-2 whitespace-nowrap">{date}</td>
-                      <td className="px-3 py-2 whitespace-nowrap">{time}</td>
-                      <td className="px-3 py-2 break-all max-w-xs">{v.visitorId}</td>
-                      {isAuthenticated && (
-                        <td className="px-3 py-2 text-center">
-                          <button
-                            className="text-red-600 hover:text-white bg-transparent rounded-full p-1 transition-colors cursor-pointer"
-                            title="Delete this record"
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleDeleteRecord(v._id);
-                            }}
-                          >
-                            🗑️
-                          </button>
-                        </td>
-                      )}
+          <Window
+            title="timeline"
+            className="mb-6"
+            bodyClassName="p-4"
+            right={
+              <div className="flex gap-1">
+                {[
+                  [30, "30d"],
+                  [90, "90d"],
+                  [365, "1y"],
+                  [0, "all"],
+                ].map(([n, l]) => (
+                  <button key={l} type="button" className="btn-term is-sm" aria-pressed={range === n} onClick={() => setRange(n)}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            }
+          >
+            <Bars values={timeline.map(([, c]) => c)} titles={timeline.map(([d, c]) => `${d}: ${c}`)} height={130} />
+            <div className="mt-1 flex justify-between text-[0.68rem] t-faint">
+              <span>{timeline[0]?.[0]}</span>
+              <span>
+                {timeline.reduce((s, [, c]) => s + c, 0)} visits in range · max {Math.max(0, ...timeline.map(([, c]) => c))}/day
+              </span>
+              <span>{timeline[timeline.length - 1]?.[0]}</span>
+            </div>
+          </Window>
+
+          <Window
+            title="tail -f visitors.log"
+            className="mb-6"
+            right={
+              <div className="flex flex-wrap items-center gap-2 text-[0.7rem] normal-case tracking-normal">
+                <input type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} aria-label="From date" className="border border-[var(--t-faint)] bg-transparent px-1 text-[var(--t-text)] [color-scheme:dark]" />
+                <span className="t-faint">→</span>
+                <input type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} aria-label="To date" className="border border-[var(--t-faint)] bg-transparent px-1 text-[var(--t-text)] [color-scheme:dark]" />
+                {(from || to) && (
+                  <button type="button" className="btn-term is-sm" onClick={() => { setFrom(""); setTo(""); }}>
+                    clear
+                  </button>
+                )}
+              </div>
+            }
+          >
+            <div className="max-h-[420px] overflow-auto">
+              <table className="w-full border-collapse text-left text-[0.8rem] tabular-nums">
+                <thead className="sticky top-0 bg-[var(--t-panel)]">
+                  <tr className="text-[0.65rem] uppercase tracking-[0.14em] t-dim">
+                    <th className="px-4 py-2 font-normal">date</th>
+                    <th className="px-2 py-2 font-normal">time</th>
+                    <th className="px-2 py-2 font-normal">visitor</th>
+                    <th className="px-4 py-2 text-right font-normal">rm</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-6 text-center t-dim">
+                        no visits in this range
+                      </td>
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+                  )}
+                  {filtered.slice(0, limit).map((v) => (
+                    <tr key={v._id} className="border-t border-[var(--t-line)] hover:bg-[var(--t-ghost)]">
+                      <td className="px-4 py-1.5 t-text">{ymd(v.at)}</td>
+                      <td className="px-2 py-1.5 t-dim">{v.at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td>
+                      <td className="px-2 py-1.5 t-faint" title={v.visitorId}>
+                        {String(v.visitorId).slice(0, 8)}…
+                      </td>
+                      <td className="px-4 py-1.5 text-right">
+                        <button type="button" className="t-faint hover:text-[var(--t-alert)]" onClick={() => removeOne(v._id)} aria-label="Delete this record">
+                          ×
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {filtered.length > limit && (
+              <div className="border-t border-[var(--t-line)] px-4 py-2">
+                <button type="button" className="btn-term is-sm" onClick={() => setLimit((l) => l + 100)}>
+                  show more ({filtered.length - limit} left)
+                </button>
+              </div>
+            )}
+          </Window>
+
+          <section className="border border-dashed border-[var(--t-faint)] p-4 text-sm">
+            {!showDanger ? (
+              <button type="button" className="btn-term is-sm" onClick={() => setShowDanger(true)}>
+                danger zone…
+              </button>
+            ) : (
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="t-alert">rm -rf visitors/*</span>
+                <span className="t-dim">type DELETE to wipe all {rows.length} records:</span>
+                <input
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  aria-label="Type DELETE to confirm"
+                  className="w-28 border border-[var(--t-faint)] bg-transparent px-2 py-1 text-[var(--t-hi)] outline-none focus:border-[var(--t-alert)]"
+                />
+                <button type="button" className="btn-term is-sm" disabled={confirm !== "DELETE"} onClick={removeAll}>
+                  wipe
+                </button>
+                <button type="button" className="btn-term is-sm" onClick={() => { setShowDanger(false); setConfirm(""); }}>
+                  cancel
+                </button>
+              </div>
+            )}
+          </section>
+
+          <p className="mt-6 text-[0.72rem] t-faint">
+            A record is one browser: the visitor cookie lasts 24 h and each visit updates that browser’s last-seen time,
+            so counts approximate unique browsers per day. Your own latest visit is removed when you open this page.
+          </p>
+        </>
+      )}
+    </main>
   );
-} 
+}

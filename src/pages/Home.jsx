@@ -1,26 +1,42 @@
-import { Navbar } from "../components/Navbar";
-import { StarBackground } from "@/components/StarBackground";
-import { HeroSection } from "../components/HeroSection";
-import { AboutSection } from "../components/AboutSection";
-import { ResearchInterestsSection } from "../components/ResearchInterestsSection";
-import { EducationSection } from "../components/EducationSection";
-import { TeachingSection } from "../components/TeachingSection";
-import { PublicationsSection } from "../components/PublicationsSection";
-import { ResearchProjectsSection } from "../components/ResearchProjectsSection";
-import { SkillsSection } from "../components/SkillsSection";
-import { ProjectsSection } from "../components/ProjectsSection";
-import { AwardsSection } from "../components/AwardsSection";
-import { ActivitiesSection } from "../components/ActivitiesSection";
-import { ContactSection } from "../components/ContactSection";
-import { Footer } from "../components/Footer";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { sections } from "@/data/portfolio";
+import { isTyping, scrollToSection } from "@/hooks/useTerm";
+import { useTerm } from "@/components/term/termStore";
+import { BootSequence } from "@/components/term/Crt";
+import { TopBar, DepthGauge } from "@/components/term/TopBar";
+import { Hero } from "@/components/sections/Hero";
+import { Research } from "@/components/sections/Research";
+import { Publications } from "@/components/sections/Publications";
+import { GitLog } from "@/components/sections/GitLog";
+import { Projects } from "@/components/sections/Projects";
+import { System } from "@/components/sections/System";
+import { Contact, Footer } from "@/components/sections/Contact";
+import { Scout } from "@/components/scout/Scout";
+
+function generateUUID() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0, v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function getCookie(name) {
+  const parts = `; ${document.cookie}`.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
+function setCookie(name, value, days = 1) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+}
 
 export const Home = () => {
   const { hash } = useLocation();
+  const { shellOpen } = useTerm();
 
-  // Arriving from a detail page at /#publications: the router restores the URL
-  // but does not scroll, and the target section only exists after this mount.
+  // Arriving from a detail page at /#papers: the router restores the URL but
+  // does not scroll, and the target section only exists after this mount.
   useEffect(() => {
     if (!hash) return;
     const el = document.getElementById(hash.slice(1));
@@ -28,67 +44,52 @@ export const Home = () => {
   }, [hash]);
 
   useEffect(() => {
-    // Generate or get visitor ID from cookie
-    let visitorId = getCookie('unique_visitor_id');
+    let visitorId = getCookie("unique_visitor_id");
     if (!visitorId) {
       visitorId = generateUUID();
-      setCookie('unique_visitor_id', visitorId, 1); // 1 day expiration
+      setCookie("unique_visitor_id", visitorId, 1);
     }
-
-    // Record the visit with the visitor ID
     fetch("/api/visitor", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-visitor-id": visitorId
-      }
+      headers: { "Content-Type": "application/json", "x-visitor-id": visitorId },
     }).catch(console.error);
   }, []);
 
-  // Helper functions for cookie management
-  function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
+  // 1–7 jump between sections
+  useEffect(() => {
+    const onKey = (e) => {
+      if (shellOpen || e.metaKey || e.ctrlKey || e.altKey || isTyping(document.activeElement)) return;
+      const s = sections.find((x) => x.key === e.key);
+      if (s) {
+        e.preventDefault();
+        scrollToSection(s.id);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [shellOpen]);
 
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-  }
-
-  function setCookie(name, value, days = 1) {
-    const expires = new Date(Date.now() + days * 864e5).toUTCString();
-    document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-  }
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
-      {/* Background Effects */}
-      <StarBackground />
-
-      {/* Navbar */}
-      <Navbar />
-
-      {/* Main Content — section order mirrors the CV. */}
-      <main className="flex-1">
-        <HeroSection />
-        <AboutSection />
-        <ResearchInterestsSection />
-        <EducationSection />
-        <TeachingSection />
-        <PublicationsSection />
-        <ResearchProjectsSection />
-        <SkillsSection />
-        <ProjectsSection />
-        <AwardsSection />
-        <ActivitiesSection />
-        <ContactSection />
+    <div className="min-h-screen overflow-x-clip">
+      <BootSequence />
+      <a href="#research" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:bg-[var(--t-amber)] focus:px-3 focus:py-2 focus:text-[var(--t-bg)]">
+        Skip to research
+      </a>
+      <TopBar />
+      <DepthGauge />
+      <main>
+        <Hero />
+        <System />
+        <Research />
+        <Publications />
+        <GitLog />
+        <Projects />
+        <Contact />
       </main>
-
-      {/* Footer */}
       <Footer />
+      <Scout />
     </div>
   );
 };
+
+export default Home;

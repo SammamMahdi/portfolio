@@ -1,35 +1,36 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
-import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 import WorkDetail from "./pages/WorkDetail";
 import { Toaster } from "@/components/ui/toaster";
-import { AnimatedRobot } from "./components/AnimatedRobot";
+import { TermProvider } from "@/components/term/TermContext";
+import { Crt } from "@/components/term/Crt";
+import { Shell } from "@/components/shell/Shell";
 
-function AppContent() {
-  const location = useLocation();
-  const hideRobot =
-    location.pathname.startsWith("/analytics") ||
-    location.pathname.startsWith("/notfound") ||
-    location.pathname.startsWith("/work");
-  return (
-    <>
-      <Toaster />
-      {!hideRobot && <AnimatedRobot />}
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="/work/:slug" element={<WorkDetail />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
-  );
-}
+const Analytics = lazy(() => import("./pages/Analytics"));
 
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <TermProvider>
+        <Toaster />
+        <Crt />
+        <Shell />
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="/work/:slug" element={<WorkDetail />} />
+          <Route
+            path="/analytics"
+            element={
+              <Suspense fallback={null}>
+                <Analytics />
+              </Suspense>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </TermProvider>
     </BrowserRouter>
   );
 }

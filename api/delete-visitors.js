@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+import { authorized } from "./_auth.js";
 
 const uri = process.env.MONGODB_URI;
 const dbName = "portfolio";
@@ -21,6 +22,7 @@ export default async function handler(req, res) {
   if (req.method !== "DELETE") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+  if (!authorized(req, res)) return;
 
   console.log("Delete visitors API called");
 
