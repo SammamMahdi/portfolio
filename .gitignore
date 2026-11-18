@@ -14,9 +14,14 @@ dist-ssr
 
 # Private working files — keep out of the public repo
 CV-*.tex
+CVs/
+CV-*.pdf
+CV-*.synctex.gz
+ai_ml_engineer_*.pdf
 CV-MASTER.md
 Sammam_Mahdi_CV.pdf
 sammam_new.png
+sammam_cv.jpg
 inspoimages/
 # template README + banner (deleted from the repo earlier)
 README.md

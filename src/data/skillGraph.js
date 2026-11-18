@@ -36,6 +36,7 @@ const USES = {
   "edge-agent": ["llm", "edge", "assist"],
   dristee: ["3d", "det", "llm", "assist"],
   "cervical-cancer": ["health", "edge", "unc"],
+  penumbra: ["web", "gfx", "3d", "llm"],
   weheal: ["web", "health", "llm"],
   skillwise: ["web", "lmk"],
   "journaling-fs": ["sys"],

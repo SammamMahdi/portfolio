@@ -247,6 +247,19 @@ export const projects = [
     links: [{ label: "code", href: "https://github.com/SammamMahdi/Cervical-Cancer" }],
   },
   {
+    slug: "penumbra",
+    group: "engineering",
+    state: "DONE",
+    badge: "Dhaka champion",
+    name: "Penumbra",
+    full: "Lunar south-pole landing planner · NASA Space Apps 2026",
+    stack: "react · three.js · fastapi",
+    summary:
+      "Plans a landing at the Moon's south pole: how much sunlight, Earth visibility and Deep Space Network contact a lander gets, not just at the aim point but across 2,000 simulated touchdowns. Real NASA/JPL terrain and orbit data, a 3D Moon and skyline view, site comparison, and Armstrong, a plain-language guide with an optional AI assistant that runs the app's own analyses. Built with Team Tewre Zahbeau; Dhaka regional champion, NASA Space Apps Challenge 2026.",
+    image: "/projects/penumbra.jpg",
+    links: [{ label: "code", href: "https://github.com/SammamMahdi/Penumbra" }],
+  },
+  {
     slug: "weheal",
     group: "engineering",
     state: "DONE",
@@ -371,6 +384,7 @@ export const skills = [
 
 export const honors = [
   ["Highest Distinction & Vice-Chancellor's List", "BRAC University — graduation; VC's List across multiple semesters"],
+  ["Dhaka Regional Champion — NASA Space Apps Challenge 2026", "Team Tewre Zahbeau · Penumbra, a lunar south-pole landing planner"],
   ["Research Seed Grant Initiative (RSGI)", "competitive research grant, BRAC University, for the DRISTEE thesis project"],
   ["Globally ranked 8th — University Rover Challenge 2025", "The Mars Society · Team BRACU Mongol Tori"],
   ["1st & 3rd Runner-up — Software Engineering Showcase", "WeHeal (1st) and SkillWise (3rd), out of 200+ teams"],
