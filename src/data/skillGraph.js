@@ -28,6 +28,8 @@ export const AREAS = [
 const USES = {
   revar3r: ["3d", "unc"],
   camdet: ["3d", "det", "edge"],
+  lmsa: ["3d", "edge"],
+  intervene3d: ["3d", "unc"],
   "stroke-detection": ["lmk", "ml", "xai", "health"],
   "gesture-keyboard": ["lmk", "seq", "assist"],
   "sleep-4stage": ["ml", "xai", "health"],
@@ -49,6 +51,8 @@ const USES = {
 const SHORT = {
   revar3r: "ReVar3R",
   camdet: "CAMDet",
+  lmsa: "LMSA",
+  intervene3d: "Intervene3D",
   "stroke-detection": "Stroke XAI",
   "gesture-keyboard": "Gesture KB",
   "sleep-4stage": "Sleep XAI",

@@ -5,7 +5,9 @@
 import { profile, publications, education, skills, honors, experience } from "@/data/portfolio";
 
 const pub = (slug) => publications.find((p) => p.slug === slug);
-const firstAuthor = publications.filter((p) => p.position === "first author").map((p) => p.title.split(":")[0]);
+const SHORT_NAME = { lmsa: "LMSA", intervene3d: "Intervene3D", "gesture-keyboard": "the gesture keyboard (JCSSE)" };
+const shortName = (p) => SHORT_NAME[p.slug] || p.title.split(":")[0];
+const firstAuthor = publications.filter((p) => p.position === "first author").map(shortName);
 
 export const SUGGESTIONS = [
   "who is Sammam?",
@@ -44,6 +46,14 @@ const INTENTS = [
         action: { type: "lab", tab: "revar3r", label: "open the ReVar3R demo" },
       };
     },
+  },
+  {
+    k: /(lmsa|sparse attention|vggt|attention|speed ?up|faster)/,
+    a: () => ({ text: `LMSA — first author, ${pub("lmsa").venue}. ${pub("lmsa").tldr}`, action: { type: "scroll", id: "publications", label: "see the LMSA figure" } }),
+  },
+  {
+    k: /(intervene|mirror|abstain|abstention|illusion|display|screen)/,
+    a: () => ({ text: `${pub("intervene3d").venue}. ${pub("intervene3d").tldr}`, action: { type: "scroll", id: "publications", label: "see the Intervene3D figure" } }),
   },
   {
     k: /(camdet|camera|intrinsic|monocular|metric|3d detect)/,
@@ -107,7 +117,10 @@ const INTENTS = [
   {
     k: /(paper|publication|publish|journal|conference)/,
     a: () => ({
-      text: `${publications.length} papers: ${publications.filter((p) => p.status === "under review").length} under review (ReVar3R, CAMDet) and ${publications.filter((p) => p.status !== "under review").length} peer-reviewed, including a Q1 journal paper in IEEE Access.`,
+      text: `${publications.length} papers: ${publications.filter((p) => p.status === "under review").length} under review (${publications
+        .filter((p) => p.status === "under review")
+        .map(shortName)
+        .join(", ")}) and ${publications.filter((p) => p.status !== "under review").length} peer-reviewed, including a Q1 journal paper in IEEE Access.`,
       action: { type: "scroll", id: "publications", label: "show the papers" },
     }),
   },

@@ -70,6 +70,33 @@ export const publications = [
     contribution: "Co-designed the detection pipeline with the first author and ran the experiments and ablations.",
   },
   {
+    id: "U3",
+    slug: "lmsa",
+    status: "under review",
+    title: "Layer-Matched Sparse Attention for Low-Redundancy 3D Reconstruction",
+    authors: [ME, "F. B. Salim", "K. M. J. Sami", "R. B. Rabbani"],
+    position: "first author",
+    venue: "Under review at CVPR · arXiv:2611.23554",
+    year: 2026,
+    links: [{ label: "arXiv", href: "https://arxiv.org/abs/2611.23554" }],
+    tldr:
+      "Speeds up VGGT's global attention without training by giving each layer the estimator it needs: a per-layer statistic separates diffuse layers, which read importance-sampled shared hub keys with unbiased weights, from matching layers, which keep exact attention. On 13 unseen low-overlap scenes with 32 views it stays within 1.4 AUC@5 of dense attention (AVGGT loses 10.3, SAF3R 4.5); with 100 views it stays within 1.9 while the aggregator runs 2.0× faster.",
+    contribution: "First and corresponding author.",
+  },
+  {
+    id: "U4",
+    slug: "intervene3d",
+    status: "under review",
+    title: "Less Than Meets the Eye: Action-Set Identifiability and Principled Abstention for 3D Physical Geometry",
+    authors: ["R. U. Karim", "A. Samin", ME, "S. M. Tabassum", "M. R. A. H. Rony"],
+    position: "third author",
+    venue: "Under review at ICLR · arXiv:2611.26056",
+    year: 2026,
+    links: [{ label: "arXiv", href: "https://arxiv.org/abs/2611.26056" }],
+    tldr:
+      "A mirror, a screen and a real scene can produce the same image. Intervene3D predicts the view under each explanation for every allowed camera motion, picks the most separating motion, and reports the first physical surface only when the explanations can be told apart — otherwise it abstains. Without abstention it answers confidently on 76.4% of unresolvable synthetic scenes; with it, on none. On real displays, one executed motion cuts the median surface error of twelve depth networks by 31.5%.",
+  },
+  {
     id: "J1",
     slug: "stroke-detection",
     status: "published",

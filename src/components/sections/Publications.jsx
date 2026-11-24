@@ -10,6 +10,8 @@ const teaser = (name) => lazy(() => import("@/components/figs/TeaserFigs").then(
 const FIGS = {
   revar3r: { C: teaser("RevarFig") },
   camdet: { C: teaser("CamdetFig") },
+  lmsa: { C: teaser("LmsaFig") },
+  intervene3d: { C: teaser("Intervene3DFig") },
   "stroke-detection": { C: lazy(() => import("@/components/figs/FaceFig")) },
   "gesture-keyboard": { C: lazy(() => import("@/components/figs/HandFig")) },
   "sleep-4stage": { C: lazy(() => import("@/components/figs/SleepFig")), props: { variant: "xai" } },
@@ -124,8 +126,8 @@ export function Publications() {
       <div className="container">
         <SectionHead id="publications" title="Papers" cmd="cat papers.bib --sort=status">
           <p>
-            Two manuscripts under review, including my first-author ReVar3R; four peer-reviewed papers — one in a Q1 journal
-            (IEEE Access) and three at IEEE conferences. Each one comes with a live figure.
+            Four manuscripts under review, including my first-author ReVar3R and LMSA (CVPR); four peer-reviewed papers —
+            one in a Q1 journal (IEEE Access) and three at IEEE conferences. Each one comes with a live figure.
           </p>
         </SectionHead>
 

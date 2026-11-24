@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { Stage, AMBER, AMBER_HI, AMBER_DIM, ALERT, LINE, LO, easeInOut, clamp01 } from "./core.js";
 import { DragOrbit } from "./orbit.js";
 import { CAPTURE_CAM, LOOK_AT, OBJECTS, CAMERAS, extents, detections, applySim3 } from "./labData.js";
+import { LMSA_CENTER, lmsaViews, lmsaTokens, I3D, interveneScene, onScreen } from "./labExtra.js";
+import { LAYERS } from "../data/lmsa.js";
 
 const FAINT = LINE;
 
@@ -117,6 +119,7 @@ export class LabScene extends Stage {
 
     this.buildRevar();
     this.buildCamdet();
+    this.buildIntervene();
     this.setDemo("revar3r");
   }
 
@@ -225,6 +228,165 @@ export class LabScene extends Stage {
       new THREE.PointsMaterial({ color: AMBER_DIM, size: 1.6 * this.renderer.getPixelRatio(), sizeAttenuation: false, transparent: true, opacity: 0.9 })
     );
     this.camdet.add(pts);
+    this.buildLmsa(gt);
+  }
+
+  /* ── LMSA ──────────────────────────────────────────────────────────── */
+  buildLmsa(gt) {
+    this.lmsa = new THREE.Group();
+    this.lmsaGt = gt;
+    this.lmsaViews = lmsaViews(6);
+    this.lmsaTok = lmsaTokens(gt, this.lmsaViews);
+    this.lmsaLayer = this.lmsaLayer ?? 1;
+
+    const n = gt.length / 3;
+    this.lmsaCol = new Float32Array(n * 3);
+    this.lmsaPts = new THREE.Points(
+      new THREE.BufferGeometry()
+        .setAttribute("position", new THREE.BufferAttribute(gt, 3))
+        .setAttribute("color", new THREE.BufferAttribute(this.lmsaCol, 3)),
+      new THREE.PointsMaterial({ vertexColors: true, size: 2.2 * this.renderer.getPixelRatio(), sizeAttenuation: false })
+    );
+    this.lmsa.add(this.lmsaPts);
+
+    this.lmsaFrusta = this.lmsaViews.map((v) => {
+      const f = lines(AMBER_DIM, 1);
+      setSegments(f, frustumSegments(v.pos, LMSA_CENTER, v.fov, 0.34));
+      this.lmsa.add(f);
+      return f;
+    });
+    this.lmsaHubs = new THREE.Points(
+      new THREE.BufferGeometry(),
+      new THREE.PointsMaterial({ color: AMBER_HI, size: 5 * this.renderer.getPixelRatio(), sizeAttenuation: false })
+    );
+    this.lmsaFaint = lines(AMBER, 0.1);
+    this.lmsaLinks = lines(AMBER, 0.6);
+    this.lmsaCorr = lines(AMBER_HI, 1);
+    const qi = this.lmsaTok.q;
+    this.lmsaQ = new THREE.Points(
+      new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute([gt[qi * 3], gt[qi * 3 + 1], gt[qi * 3 + 2]], 3)),
+      new THREE.PointsMaterial({ color: ALERT, size: 9 * this.renderer.getPixelRatio(), sizeAttenuation: false })
+    );
+    this.lmsa.add(this.lmsaFaint, this.lmsaLinks, this.lmsaCorr, this.lmsaHubs, this.lmsaQ);
+    this.lmsa.visible = this.demo === "lmsa";
+    this.scene.add(this.lmsa);
+    this.syncLmsa();
+  }
+
+  setLmsaLayer(l) {
+    this.lmsaLayer = l;
+    if (!this.lmsa) return;
+    this.syncLmsa();
+    if (!this.active) this.renderOnce();
+  }
+
+  syncLmsa() {
+    const gt = this.lmsaGt, T = this.lmsaTok, L = LAYERS[this.lmsaLayer];
+    const q = [gt[T.q * 3], gt[T.q * 3 + 1], gt[T.q * 3 + 2]];
+    const at = (i) => [gt[i * 3], gt[i * 3 + 1], gt[i * 3 + 2]];
+    const col = this.lmsaCol, n = gt.length / 3;
+    const set = (i, c) => col.set([c.r, c.g, c.b], i * 3);
+    for (let i = 0; i < n; i++) set(i, LINE);
+    T.per[T.qView].forEach((i) => set(i, AMBER));
+
+    const faint = [], links = [], corr = [], hubs = [];
+    if (L.kind === "exact") {
+      // every key in every other view is read; the ones that matter are the same point seen elsewhere
+      T.others.forEach((i, j) => {
+        set(i, AMBER);
+        if (j % 3 === 0) faint.push(...q, ...at(i));
+      });
+      T.seenBy[T.q].forEach((k) => k !== T.qView && corr.push(...q, ...this.lmsaViews[k].pos));
+    } else {
+      // a few hundred shared hubs, drawn here at about one in twenty
+      const m = L.hubs === 256 ? 14 : 34;
+      T.hubOrder.slice(0, m).forEach((i) => {
+        hubs.push(...at(i));
+        links.push(...q, ...at(i));
+      });
+    }
+    this.lmsaPts.geometry.attributes.color.needsUpdate = true;
+    setSegments(this.lmsaFaint, faint);
+    setSegments(this.lmsaLinks, links);
+    setSegments(this.lmsaCorr, corr);
+    this.lmsaHubs.geometry.setAttribute("position", new THREE.Float32BufferAttribute(hubs, 3));
+    this.lmsaFrusta.forEach((f, k) => {
+      const sees = L.kind === "exact" && T.seenBy[T.q].includes(k) && k !== T.qView;
+      f.material.color.copy(k === T.qView ? ALERT : sees ? AMBER_HI : AMBER_DIM);
+    });
+  }
+
+  /* ── Intervene3D ───────────────────────────────────────────────────── */
+  buildIntervene() {
+    this.inter = new THREE.Group();
+    this.interSc = interveneScene();
+    this.interMove = 0;
+    this.interMoveTarget = 0;
+    this.interRange = I3D.ranges[0];
+    const { D, E, seg, panel } = this.interSc;
+
+    this.interCorr = lines(AMBER_DIM, 0.9);
+    setSegments(this.interCorr, seg);
+    const pts = (arr, color, size) =>
+      new THREE.Points(
+        new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute(arr.flat(), 3)),
+        new THREE.PointsMaterial({ color, size: size * this.renderer.getPixelRatio(), sizeAttenuation: false })
+      );
+    this.interD = pts(D, AMBER, 3);
+    this.interE = pts(E, AMBER_HI, 3);
+    this.interPanel = lines(AMBER_HI, 1);
+    const p = panel;
+    setSegments(this.interPanel, [
+      p.x0, p.y0, p.z, p.x1, p.y0, p.z, p.x1, p.y0, p.z, p.x1, p.y1, p.z,
+      p.x1, p.y1, p.z, p.x0, p.y1, p.z, p.x0, p.y1, p.z, p.x0, p.y0, p.z,
+    ]);
+    this.interGhost = lines(AMBER_DIM, 0.8, true);
+    this.interCam = lines(AMBER_HI, 1);
+    this.interRail = lines(AMBER_DIM, 1);
+    this.interMarks = lines(ALERT, 1);
+    this.inter.add(this.interCorr, this.interD, this.interE, this.interPanel, this.interGhost, this.interCam, this.interRail, this.interMarks);
+    this.scene.add(this.inter);
+    this.syncIntervene();
+  }
+
+  setInterMove(d) {
+    this.interMoveTarget = d;
+    if (this.reduced) this.interMove = d;
+    if (!this.active) this.renderOnce();
+  }
+
+  setInterRange(r) {
+    this.interRange = r;
+    if (!this.active) this.renderOnce();
+  }
+
+  interCamPos() {
+    return [I3D.C0[0] + this.interMove, I3D.C0[1], I3D.C0[2]];
+  }
+
+  syncIntervene() {
+    const { D, E, panel } = this.interSc;
+    const C = this.interCamPos();
+    const look = [0, (panel.y0 + panel.y1) / 2, panel.z];
+    setSegments(this.interGhost, frustumSegments(I3D.C0, look, 56, 0.3));
+    setSegments(this.interCam, frustumSegments(C, look, 56, 0.3));
+    const r = this.interRange, y = I3D.C0[1] - 0.25, z = I3D.C0[2];
+    setSegments(this.interRail, [-r, y, z, r, y, z, -r, y - 0.04, z, -r, y + 0.04, z, r, y - 0.04, z, r, y + 0.04, z]);
+    // on the screen: where the real corridor would now appear vs where the painted copy is
+    const marks = [];
+    D.forEach((P, i) => {
+      if (i % 2) return;
+      const s = onScreen(P, C);
+      marks.push(...E[i], ...s);
+    });
+    setSegments(this.interMarks, marks);
+    // looking through the camera: hide its own outline, the start pose and the rail
+    const inside = this.povT > 0.5;
+    this.interCam.visible = this.interGhost.visible = this.interRail.visible = !inside;
+  }
+
+  onTheme() {
+    if (this.lmsa) this.syncLmsa();
   }
 
   setCamera(id) {
@@ -280,12 +442,17 @@ export class LabScene extends Stage {
     this.demo = demo;
     this.revar.visible = demo === "revar3r";
     this.camdet.visible = demo === "camdet";
-    this.base = demo === "revar3r"
-      ? { target: new THREE.Vector3(0, 0.35, -0.4), yaw: 0.62, pitch: 0.42, dist: 4.9 }
-      : { target: new THREE.Vector3(0, 0.45, -0.35), yaw: 1.08, pitch: 0.5, dist: 7.6 };
+    if (this.lmsa) this.lmsa.visible = demo === "lmsa";
+    this.inter.visible = demo === "intervene3d";
+    this.base = {
+      revar3r: { target: new THREE.Vector3(0, 0.35, -0.4), yaw: 0.62, pitch: 0.42, dist: 4.9 },
+      camdet: { target: new THREE.Vector3(0, 0.45, -0.35), yaw: 1.08, pitch: 0.5, dist: 7.6 },
+      lmsa: { target: new THREE.Vector3(0, 0.5, 0.2), yaw: 0.35, pitch: 0.62, dist: 7.4 },
+      intervene3d: { target: new THREE.Vector3(0, 0.65, -1.5), yaw: 1.05, pitch: 0.38, dist: 6.4 },
+    }[demo];
     this.orbit.setTarget(0, 0);
     this.orbit.yaw = this.orbit.pitch = 0;
-    if (demo !== "camdet") this.pov = false;
+    if (demo !== "camdet" && demo !== "intervene3d") this.pov = false;
     if (!this.active) this.renderOnce();
   }
 
@@ -308,10 +475,17 @@ export class LabScene extends Stage {
       if (Math.abs(this.alignTarget - this.align) < 1e-3) this.align = this.alignTarget;
       this.dotUniforms.uAlign.value = easeInOut(this.align);
       this.syncTriads();
-    } else {
+    } else if (this.demo === "camdet") {
       this.detT = Math.min(1, this.detT + (this.reduced || dt === 0 ? 1 : dt * 1.4));
       this.povT += ((this.pov ? 1 : 0) - this.povT) * (dt === 0 && this.reduced ? 1 : k);
       this.syncCamdet();
+    } else if (this.demo === "intervene3d") {
+      this.interMove += (this.interMoveTarget - this.interMove) * (this.reduced || dt === 0 ? 1 : Math.min(1, dt * 3));
+      this.povT += ((this.pov ? 1 : 0) - this.povT) * (dt === 0 && this.reduced ? 1 : k);
+      this.syncIntervene();
+    } else if (this.lmsaQ) {
+      // the query token pulses so it is easy to find
+      this.lmsaQ.material.size = (7 + 3 * Math.sin(t * 4)) * this.renderer.getPixelRatio();
     }
 
     // orbit pose
@@ -325,10 +499,19 @@ export class LabScene extends Stage {
     const qOrbit = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(eye, b.target, new THREE.Vector3(0, 1, 0)));
     let fov = 38;
 
-    if (this.demo === "camdet" && this.povT > 1e-3) {
-      const cam = CAMERAS.find((c) => c.id === this.camId);
+    const povCam =
+      this.demo === "camdet"
+        ? (() => {
+            const c = CAMERAS.find((x) => x.id === this.camId);
+            return { pos: c.pos, look: LOOK_AT, fov: c.fov };
+          })()
+        : this.demo === "intervene3d"
+          ? { pos: this.interCamPos(), look: [0, (this.interSc.panel.y0 + this.interSc.panel.y1) / 2, I3D.zp], fov: 56 }
+          : null;
+    if (povCam && this.povT > 1e-3) {
+      const cam = povCam;
       const eyeC = v3(cam.pos);
-      const qC = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(eyeC, v3(LOOK_AT), new THREE.Vector3(0, 1, 0)));
+      const qC = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(eyeC, v3(cam.look), new THREE.Vector3(0, 1, 0)));
       const vfov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) / Math.max(1, this.camera.aspect)));
       const s = easeInOut(clamp01(this.povT));
       eye.lerp(eyeC, s);

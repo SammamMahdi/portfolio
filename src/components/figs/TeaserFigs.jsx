@@ -3,6 +3,7 @@ import { mulberry32, gaussian } from "@/lib/rand";
 import { FigFrame } from "./FigFrame";
 import { useCanvas2D, C, rgba } from "./canvas2d";
 import { openLab } from "./labLink";
+import { LAYERS as LMSA_LAYERS, COST as LMSA_COST } from "@/data/lmsa";
 
 const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
@@ -125,6 +126,214 @@ export function RevarFig() {
     >
       <div className="relative h-[240px] sm:h-full sm:min-h-[260px]">
         <canvas ref={ref} className="absolute inset-0 h-full w-full" aria-label="Animated sketch: five runs in different similarity frames, then aligned" />
+      </div>
+    </FigFrame>
+  );
+}
+
+/* ── LMSA: each global layer gets its own attention estimator ───────────── */
+export function LmsaFig() {
+  const keys = useMemo(() => {
+    // 8 views x 14 tokens; which keys a diffuse layer samples as hubs
+    const rng = mulberry32(11);
+    return Array.from({ length: 8 * 14 }, () => rng());
+  }, []);
+  const ref = useCanvas2D(
+    (ctx, { w, h, t }) => {
+      ctx.fillStyle = C.bg;
+      ctx.fillRect(0, 0, w, h);
+      const cur = Math.floor(t / 0.55) % 24;
+      const L = LMSA_LAYERS[cur];
+      ctx.font = `10px ${C.font}`;
+
+      // top: the per-layer statistic, with the fixed cut-off
+      const top = 26, bh = h * 0.36, bw = (w - 40) / 24, base = top + bh;
+      const cut = base - (1.5 / 2.6) * bh;
+      LMSA_LAYERS.forEach((d) => {
+        const x = 20 + d.l * bw, hh = (Math.min(d.stat, 2.6) / 2.6) * bh;
+        const exact = d.kind === "exact";
+        ctx.fillStyle = rgba(exact ? C.hi : C.amber, d.l === cur ? 0.95 : exact ? 0.7 : 0.4);
+        ctx.fillRect(x + 1, base - hh, bw - 2, hh);
+        if (exact) {
+          ctx.strokeStyle = C.hi;
+          ctx.strokeRect(x + 1.5, base - hh + 0.5, bw - 3, hh - 1);
+        }
+      });
+      ctx.strokeStyle = rgba(C.alert, 0.8);
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(16, cut);
+      ctx.lineTo(w - 16, cut);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = C.alert;
+      ctx.fillText("cut-off 1.5", w - 88, cut - 4);
+      ctx.fillStyle = C.faint;
+      ctx.fillText("global layer 0 … 23", 20, base + 12);
+      ctx.fillStyle = L.kind === "exact" ? C.hi : C.amber;
+      ctx.fillText(
+        `layer ${cur}: ${L.kind === "exact" ? "MATCHING · exact attention, all keys" : `DIFFUSE · own view + ${L.hubs} shared hubs`}`,
+        10,
+        16
+      );
+
+      // bottom: which keys one query reads (rows = views, query in view 0)
+      const gy = base + 26, rows = 8, cols = 14;
+      const cw = Math.min((w - 150) / cols, 14), ch = Math.min((h - gy - 26) / rows, 12);
+      const p = 0.12 + (L.hubs === 1024 ? 0.1 : 0);
+      for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++) {
+          const read = L.kind === "exact" || r === 0 || keys[r * cols + c] < p;
+          ctx.fillStyle = read ? rgba(L.kind === "exact" ? C.hi : C.amber, r === 0 ? 0.9 : 0.7) : rgba(C.line, 0.6);
+          ctx.fillRect(20 + c * cw, gy + r * ch, cw - 2, ch - 2);
+        }
+      ctx.fillStyle = C.faint;
+      ctx.fillText("keys read by one query (row = view)", 20, h - 8);
+
+      // cost per token, from the paper
+      const cx = 20 + cols * cw + 18;
+      ctx.fillStyle = C.dim;
+      ctx.fillText("GFLOP/token", cx, gy + 8);
+      const step = Math.min(30, (h - gy - 30) / 3);
+      LMSA_COST.forEach((c, i) => {
+        const y = gy + 26 + i * step, sc = (w - cx - 70) / 22.49;
+        ctx.fillStyle = C.faint;
+        ctx.fillText(`N=${c.n}`, cx, y + 9);
+        const bx = cx + 44;
+        ctx.fillStyle = rgba(C.dim, 0.5);
+        ctx.fillRect(bx, y, c.dense * sc, 6);
+        ctx.fillStyle = C.amber;
+        ctx.fillRect(bx, y + 8, c.lmsa * sc, 6);
+      });
+    },
+    { stillAt: 7 }
+  );
+
+  return (
+    <FigFrame
+      title="layer-matched sparse attention"
+      tabs={<LabButton tab="lmsa" />}
+      caption={
+        <>
+          Most layers only need the gist of the other views, so they read their own view plus a few hundred shared{" "}
+          <span className="t-amber">hub</span> keys. The few layers whose statistic crosses the cut-off match points
+          across views and keep <span className="t-hi">exact</span> attention. Cost per token (grey dense, amber LMSA) is
+          the paper&rsquo;s.
+        </>
+      }
+      note="Layer roles, hub counts and costs follow the paper; bar heights and the key grid are schematic."
+    >
+      <div className="relative h-[260px] sm:h-full sm:min-h-[280px]">
+        <canvas ref={ref} className="absolute inset-0 h-full w-full" aria-label="Animated sketch: per-layer statistic and the keys each layer reads" />
+      </div>
+    </FigFrame>
+  );
+}
+
+/* ── Intervene3D: a screen and a real corridor look the same until you move ── */
+export function Intervene3DFig() {
+  const ref = useCanvas2D(
+    (ctx, { w, h, t }) => {
+      ctx.fillStyle = C.bg;
+      ctx.fillRect(0, 0, w, h);
+      ctx.font = `10px ${C.font}`;
+      // two rounds: a small allowed motion (abstain), then a larger one (answer)
+      const T = t % 12, round = T < 6 ? 0 : 1, u = (T % 6) / 6;
+      const dMax = round === 0 ? 0.12 : 0.6;
+      const d = dMax * Math.sin(Math.min(1, u / 0.7) * Math.PI * 0.5);
+
+      // top-down scene: camera at bottom, display panel, depicted corridor behind it
+      const zp = 1, zc = 2.2;
+      const sy = h - 74, S = Math.min(w / 4.2, (sy - 50) / zc), sx = w * 0.42;
+      const feats = [-0.32, -0.11, 0.1, 0.3]; // where the screen shows each corridor point
+      const P = (x, z) => [sx + x * S, sy - z * S];
+      const cam = P(d, 0);
+      // sight rays from the camera to each corridor point
+      ctx.strokeStyle = rgba(C.dim, 0.35);
+      ctx.setLineDash([2, 4]);
+      feats.forEach((x) => {
+        ctx.beginPath();
+        ctx.moveTo(...cam);
+        ctx.lineTo(...P(x * (zc / zp), zc));
+        ctx.stroke();
+      });
+      ctx.setLineDash([]);
+      // depicted corridor (H_D)
+      ctx.fillStyle = C.amber;
+      feats.forEach((x) => ctx.fillRect(P(x * (zc / zp), zc)[0] - 3, P(0, zc)[1] - 3, 6, 6));
+      ctx.fillText("real corridor (H_D)", P(0.85, zc)[0] + 6, P(0, zc)[1] + 4);
+      // the screen and the picture on it (H_E)
+      ctx.strokeStyle = C.hi;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(...P(-0.45, zp));
+      ctx.lineTo(...P(0.45, zp));
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      feats.forEach((x) => ctx.strokeRect(P(x, zp)[0] - 3, P(0, zp)[1] - 3, 6, 6));
+      ctx.fillStyle = C.hi;
+      ctx.fillText("screen (H_E)", P(0.5, zp)[0] + 6, P(0, zp)[1] + 4);
+      // camera and allowed motion range
+      ctx.strokeStyle = rgba(C.dim, 0.6);
+      ctx.beginPath();
+      ctx.moveTo(...P(-dMax, -0.12));
+      ctx.lineTo(...P(dMax, -0.12));
+      ctx.stroke();
+      ctx.fillStyle = C.faint;
+      ctx.fillText(`allowed motion ±${dMax.toFixed(2)}`, P(dMax, -0.12)[0] + 8, P(0, -0.12)[1] + 3);
+      ctx.fillStyle = C.text;
+      ctx.fillRect(cam[0] - 6, cam[1] - 4, 12, 8);
+
+      // predicted image positions under each hypothesis (they coincide at d = 0)
+      const iy = h - 30, ix = 30, iw = w - 60, f = iw * 0.55;
+      ctx.strokeStyle = C.line;
+      ctx.strokeRect(ix, iy - 8, iw, 16);
+      let sep = 0;
+      feats.forEach((x) => {
+        const X = x * (zc / zp), xp = x; // same ray at d = 0
+        const uD = (X - d) / zc, uE = (xp - d) / zp;
+        sep = Math.max(sep, Math.abs(uD - uE));
+        ctx.fillStyle = C.amber;
+        ctx.fillRect(ix + iw / 2 + uD * f - 2, iy - 5, 4, 10);
+        ctx.strokeStyle = C.hi;
+        ctx.strokeRect(ix + iw / 2 + uE * f - 3, iy - 6, 6, 12);
+      });
+      ctx.fillStyle = C.faint;
+      ctx.fillText("image after the move: amber = real depth, outline = screen", ix, iy + 20);
+
+      // decision
+      const tau = 0.12, done = u > 0.75;
+      ctx.fillStyle = C.dim;
+      ctx.fillText(`separability ${sep.toFixed(2)}  ·  threshold ${tau}`, 10, 16);
+      if (done) {
+        const ok = sep >= tau;
+        ctx.fillStyle = ok ? C.hi : C.alert;
+        ctx.fillText(ok ? "ANSWER: screen · first surface at the panel" : "ABSTAIN: no allowed move separates them", 10, 30);
+      } else {
+        ctx.fillStyle = C.faint;
+        ctx.fillText(d < 0.01 ? "identical first image" : "moving the camera…", 10, 30);
+      }
+    },
+    { stillAt: 10.8 }
+  );
+
+  return (
+    <FigFrame
+      title="motion as evidence"
+      tabs={<LabButton tab="intervene3d" />}
+      caption={
+        <>
+          A <span className="t-hi">screen</span> showing a corridor and a{" "}
+          <span className="t-amber">real corridor</span> give the same first image. A camera move shifts them differently;
+          Intervene3D answers only when an allowed move separates the explanations, and{" "}
+          <span className="t-alert">abstains</span> otherwise. On real displays, one executed move cut the median
+          surface error of twelve depth networks by 31.5%.
+        </>
+      }
+      note="A top-down sketch of the idea (toy geometry); the 31.5% is the paper's result."
+    >
+      <div className="relative h-[260px] sm:h-full sm:min-h-[280px]">
+        <canvas ref={ref} className="absolute inset-0 h-full w-full" aria-label="Animated sketch: a screen and a real corridor separated by camera motion" />
       </div>
     </FigFrame>
   );
